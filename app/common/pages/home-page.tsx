@@ -39,6 +39,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
         </div>
         {Array.from({ length: 10 }).map((_, index) => (
           <ViewpointCard
+            key={`viewpointId-${index}`}
             id={`viewpointId-${index}`}
             title="Viewpoint Name"
             description="Viewpoint Description"
@@ -68,6 +69,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
         </div>
         {Array.from({ length: 11 }).map((_, index) => (
           <PostCard
+            key={`postId-${index}`}
             id={`postId-${index}`}
             title="What is the best viewpoint?"
             body="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
