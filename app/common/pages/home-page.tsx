@@ -30,10 +30,10 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
         <div className="space-y-4 sm:space-y-6 lg:space-y-8">
           <div className="space-y-2 sm:space-y-4">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight tracking-tight">
-              Today's Viewpoint
+              Featured Viewpoints
             </h2>
             <p className="text-base sm:text-lg lg:text-xl font-light text-foreground">
-              The best Viewpoint made by our community today.
+              Discover today's most breathtaking viewpoints
             </p>
             <Button variant="link" asChild className="text-base sm:text-lg p-0">
               <Link to="/viewpoints">Explore all viewpoints &rarr;</Link>
@@ -44,16 +44,16 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
               <ViewpointCard
                 key={`viewpointId-${index}`}
                 id={`viewpointId-${index}`}
-                title="Viewpoint Name"
-                description="Viewpoint Description"
-                locationName="Viewpoint Location"
-                latitude={12}
-                longitude={12}
+                title="Seoraksan Sunrise Peak"
+                description="A stunning viewpoint offering panoramic views of the East Sea and surrounding mountains"
+                locationName="Seoraksan National Park"
+                latitude={38.1234}
+                longitude={128.5678}
                 thumbnailPhotoUrl="https://via.placeholder.com/150"
                 createdAt={new Date()}
                 createdBy={{
                   id: "1",
-                  username: "Viewpoint User",
+                  username: "MountainPhotographer",
                 }}
               />
             ))}
@@ -68,10 +68,10 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
               Popular Trails
             </h2>
             <p className="text-base sm:text-lg lg:text-xl font-light text-foreground">
-              The most popular trails in our community.
+              Explore our most-loved hiking trails
             </p>
             <Button variant="link" asChild className="text-base sm:text-lg p-0">
-              <Link to="/trails">Explore all trails &rarr;</Link>
+              <Link to="/trails">View all trails &rarr;</Link>
             </Button>
           </div>
           <TrailMarquee pauseOnHover reverse />
@@ -82,13 +82,13 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
         <div className="space-y-4 sm:space-y-6 lg:space-y-8">
           <div className="space-y-2 sm:space-y-4">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight tracking-tight">
-              Latest Posts
+              Latest Stories
             </h2>
             <p className="text-base sm:text-lg lg:text-xl font-light text-foreground">
-              The latest posts from our community.
+              Read inspiring stories from our community
             </p>
             <Button variant="link" asChild className="text-base sm:text-lg p-0">
-              <Link to="/community">Explore all posts &rarr;</Link>
+              <Link to="/community">Read all stories &rarr;</Link>
             </Button>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2 sm:gap-4 lg:gap-6">
@@ -96,20 +96,20 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
               <PostCard
                 key={`postId-${index}`}
                 id={`postId-${index}`}
-                title="What is the best viewpoint?"
-                body="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                title="My First Winter Ascent of Hallasan"
+                body="Conquering South Korea's highest peak in winter was both challenging and rewarding. Here's my journey to the summit."
                 visitedDate={new Date()}
-                weatherDescription="Sunny"
+                weatherDescription="Snowy"
                 createdAt={new Date()}
                 createdBy={{
                   id: "1",
-                  username: "Nico",
+                  username: "WinterHiker",
                   profileImageUrl: "https://github.com/apple.png",
                 }}
                 viewpoint={{
                   id: "1",
-                  title: "What is the best viewpoint?",
-                  locationName: "Viewpoint",
+                  title: "Hallasan Summit",
+                  locationName: "Jeju Island",
                 }}
               />
             ))}
