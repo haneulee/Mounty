@@ -8,6 +8,7 @@ import {
   SettingsIcon,
   UserIcon,
 } from "lucide-react";
+import { Dock, DockItem } from "./ui/dock";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +30,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 
 import { Button } from "./ui/button";
+import { HyperText } from "./ui/hyper-text";
 import { Link } from "react-router";
 import { Separator } from "~/common/components/ui/separator";
 import { cn } from "~/lib/utils";
@@ -178,32 +180,24 @@ export default function Navigation({
       </div>
       {isLoggedIn ? (
         <div className="flex items-center gap-2 sm:gap-4">
-          <Button
-            size="icon"
-            variant="ghost"
-            asChild
-            className="relative hidden sm:flex"
-          >
-            <Link to="/my/notifications">
-              <BellIcon className="size-4" />
-              {hasNotifications && (
-                <div className="absolute top-1.5 right-1.5 size-2 bg-red-500 rounded-full" />
-              )}
-            </Link>
-          </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            asChild
-            className="relative hidden sm:flex"
-          >
-            <Link to="/my/messages">
-              <MessageCircleIcon className="size-4" />
-              {hasMessages && (
-                <div className="absolute top-1.5 right-1.5 size-2 bg-red-500 rounded-full" />
-              )}
-            </Link>
-          </Button>
+          <Dock className="hidden sm:flex">
+            <DockItem asChild>
+              <Link to="/my/notifications" className="relative">
+                <BellIcon className="size-4" />
+                {hasNotifications && (
+                  <div className="absolute top-1.5 right-1.5 size-2 bg-red-500 rounded-full" />
+                )}
+              </Link>
+            </DockItem>
+            <DockItem asChild>
+              <Link to="/my/messages" className="relative">
+                <MessageCircleIcon className="size-4" />
+                {hasMessages && (
+                  <div className="absolute top-1.5 right-1.5 size-2 bg-red-500 rounded-full" />
+                )}
+              </Link>
+            </DockItem>
+          </Dock>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Avatar className="cursor-pointer size-8 sm:size-10">
@@ -272,7 +266,15 @@ export default function Navigation({
                   <div className="space-y-8 pt-4">
                     {menus.map((menu) => (
                       <div key={menu.name} className="space-y-3">
-                        <h3 className="font-medium text-base">{menu.name}</h3>
+                        <h3 className="font-medium text-base">
+                          <HyperText
+                            duration={600}
+                            delay={100}
+                            className="hover:text-primary transition-colors"
+                          >
+                            {menu.name}
+                          </HyperText>
+                        </h3>
                         <div className="space-y-2">
                           {menu.items?.map((item) => (
                             <Link

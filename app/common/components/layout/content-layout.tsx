@@ -11,6 +11,7 @@ import { ChevronDown } from "lucide-react";
 import { Hero } from "~/common/components/hero";
 import { Input } from "~/common/components/ui/input";
 import { Link } from "react-router";
+import { Particles } from "../ui/particles";
 import { Search } from "lucide-react";
 
 interface FilterOption {
@@ -61,6 +62,7 @@ export function ContentLayout({
 }: ContentLayoutProps) {
   return (
     <div className="min-h-screen">
+      <Particles className="opacity-30" />
       <Hero title={title} subtitle={subtitle} />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">

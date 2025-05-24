@@ -2,6 +2,7 @@ import { Button } from "~/common/components/ui/button";
 import { Link } from "react-router";
 import { PostCard } from "~/features/community/components/post-card";
 import type { Route } from "~/types";
+import { TrailMarquee } from "~/features/trails/components/trail-marquee";
 import { ViewpointCard } from "~/features/viewpoints/components/viewpoint-card";
 
 export function loader({ request }: Route.LoaderArgs) {
@@ -57,6 +58,23 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
               />
             ))}
           </div>
+        </div>
+      </section>
+
+      <section>
+        <div className="space-y-4 sm:space-y-6 lg:space-y-8">
+          <div className="space-y-2 sm:space-y-4">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight tracking-tight">
+              Popular Trails
+            </h2>
+            <p className="text-base sm:text-lg lg:text-xl font-light text-foreground">
+              The most popular trails in our community.
+            </p>
+            <Button variant="link" asChild className="text-base sm:text-lg p-0">
+              <Link to="/trails">Explore all trails &rarr;</Link>
+            </Button>
+          </div>
+          <TrailMarquee pauseOnHover reverse />
         </div>
       </section>
 
