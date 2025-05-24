@@ -1,5 +1,6 @@
 import { Form, Link } from "react-router";
 
+import AuthButtons from "../components/auto-buttons";
 import { Button } from "~/common/components/ui/button";
 import InputPair from "~/common/components/input-pair";
 import type { Route } from "~/types";
@@ -64,6 +65,7 @@ export default function JoinPage({ loaderData }: Route.ComponentProps) {
             Create account
           </Button>
         </Form>
+        <AuthButtons />
       </div>
     </div>
   );
