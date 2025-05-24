@@ -11,8 +11,9 @@ import {
   CardHeader,
   CardTitle,
 } from "~/common/components/ui/card";
-import { ClockIcon, MapPinIcon } from "lucide-react";
+import { ClockIcon, MapPinIcon, StarIcon } from "lucide-react";
 
+import { Badge } from "~/common/components/ui/badge";
 import { Link } from "react-router";
 import { formatDistanceToNow } from "date-fns";
 
@@ -28,7 +29,6 @@ interface ViewpointCardProps {
   createdBy: {
     id: string;
     username: string;
-    profileImageUrl?: string;
   };
 }
 
@@ -37,59 +37,56 @@ export function ViewpointCard({
   title,
   description,
   locationName,
-  latitude,
-  longitude,
-  thumbnailPhotoUrl,
+  thumbnailPhotoUrl = "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070&auto=format&fit=crop",
   createdAt,
   createdBy,
 }: ViewpointCardProps) {
   return (
-    <Link to={`/viewpoints/${id}`}>
-      <Card className="w-full overflow-hidden hover:bg-card/50 transition-colors relative aspect-[4/3]">
-        {thumbnailPhotoUrl && (
-          <div className="absolute inset-0">
-            <img
-              src={thumbnailPhotoUrl}
-              alt={title}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+    <Card className="relative h-full flex flex-col overflow-hidden">
+      <img
+        src={thumbnailPhotoUrl}
+        alt={title}
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      <Link to={`/viewpoints/${id}`} className="block h-full">
+        <div className=" h-full">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+          <div className="relative h-full flex flex-col justify-end p-3 sm:p-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Avatar className="size-6 sm:size-8 border-2 border-white">
+                  <AvatarImage
+                    src={`https://github.com/${createdBy.username}.png`}
+                  />
+                  <AvatarFallback className="bg-white/20 text-white">
+                    {createdBy.username[0]}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-white truncate">
+                    {createdBy.username}
+                  </p>
+                  <p className="text-xs text-white/80 truncate">
+                    {formatDistanceToNow(createdAt, { addSuffix: true })}
+                  </p>
+                </div>
+              </div>
+              <h3 className="text-sm sm:text-base font-semibold text-white line-clamp-2">
+                {title}
+              </h3>
+              <p className="text-xs sm:text-sm text-white/80 line-clamp-2 sm:line-clamp-3">
+                {description}
+              </p>
+              <Badge
+                variant="secondary"
+                className="text-xs bg-white/20 hover:bg-white/30 text-white border-0"
+              >
+                {locationName}
+              </Badge>
+            </div>
           </div>
-        )}
-        <div className="relative h-full flex flex-col justify-end p-6">
-          <CardHeader className="p-0">
-            <CardTitle className="text-2xl font-semibold leading-none tracking-tight text-white">
-              {title}
-            </CardTitle>
-            <CardDescription className="text-white/80 line-clamp-2 mt-2">
-              {description}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-0 mt-4">
-            <div className="flex items-center gap-2 text-sm text-white/80">
-              <MapPinIcon className="w-4 h-4" />
-              <span>{locationName}</span>
-            </div>
-          </CardContent>
-          <CardFooter className="p-0 mt-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Avatar className="w-6 h-6 border-2 border-white">
-                <AvatarImage src={createdBy.profileImageUrl} />
-                <AvatarFallback className="bg-white/20 text-white">
-                  {createdBy.username[0].toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <span className="text-sm text-white/80">
-                {createdBy.username}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-white/80">
-              <ClockIcon className="w-4 h-4" />
-              <span>{formatDistanceToNow(createdAt, { addSuffix: true })}</span>
-            </div>
-          </CardFooter>
         </div>
-      </Card>
-    </Link>
+      </Link>
+    </Card>
   );
 }

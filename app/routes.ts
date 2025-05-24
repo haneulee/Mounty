@@ -20,21 +20,18 @@ export default [
     ...prefix("map", [
       index("features/viewpoints/pages/viewpoints-map-page.tsx"),
     ]),
-    route("/new", "features/viewpoints/pages/submit-viewpoint-page.tsx"),
+    route(
+      "/:viewpointId",
+      "features/viewpoints/pages/viewpoints-detail-page.tsx"
+    ),
+    route("new", "features/viewpoints/pages/submit-viewpoint-page.tsx"),
   ]),
 
   // Trails routes
   ...prefix("trails", [
     index("features/trails/pages/trails-page.tsx"),
-    ...prefix("difficulty", [
-      index("features/trails/pages/trails-difficulty-page.tsx"),
-    ]),
-    ...prefix("season", [
-      index("features/trails/pages/trails-season-page.tsx"),
-    ]),
-    ...prefix("create", [
-      index("features/trails/pages/trails-create-page.tsx"),
-    ]),
+    route("/:trailId", "features/trails/pages/trails-detail-page.tsx"),
+    route("new", "features/trails/pages/trails-create-page.tsx"),
   ]),
 
   // Posts routes
@@ -47,11 +44,7 @@ export default [
   // My Page routes
   ...prefix("mypage", [
     ...prefix("profile", [index("features/users/pages/my-profile-page.tsx")]),
-    ...prefix("trails", [index("features/users/pages/my-trails-page.tsx")]),
-    ...prefix("posts", [index("features/users/pages/my-posts-page.tsx")]),
-    ...prefix("saved-viewpoints", [
-      index("features/users/pages/my-saved-viewpoints-page.tsx"),
-    ]),
+    ...prefix("favorite", [index("features/users/pages/my-favorite-page.tsx")]),
   ]),
 
   // Auth routes

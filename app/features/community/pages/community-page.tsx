@@ -1,18 +1,25 @@
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "~/common/components/ui/dropdown-menu";
-import { Form, Link, useSearchParams } from "react-router";
-import { PERIOD_OPTIONS, SORT_OPTIONS } from "../constants";
-
-import { Button } from "~/common/components/ui/button";
-import { ChevronDownIcon } from "lucide-react";
-import { Hero } from "~/common/components/hero";
-import { Input } from "~/common/components/ui/input";
+import { ContentLayout } from "~/common/components/layout/content-layout";
 import { PostCard } from "../components/post-card";
 import type { Route } from "./+types/community-page";
+import { useSearchParams } from "react-router";
+
+interface FilterOption {
+  label: string;
+  value: string;
+}
+
+const SORT_OPTIONS: FilterOption[] = [
+  { label: "Newest", value: "newest" },
+  { label: "Popular", value: "popular" },
+  { label: "Rating", value: "rating" },
+];
+
+const PERIOD_OPTIONS: FilterOption[] = [
+  { label: "All Time", value: "all" },
+  { label: "This Week", value: "week" },
+  { label: "This Month", value: "month" },
+  { label: "This Year", value: "year" },
+];
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: "Posts | Mounty" }];
@@ -22,116 +29,71 @@ export default function CommunityPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const sorting = searchParams.get("sorting") || "newest";
   const period = searchParams.get("period") || "all";
+  const search = searchParams.get("search") || "";
+
+  const sidebarFilters = [
+    {
+      title: "Topics",
+      type: "link" as const,
+      options: [
+        { label: "AI Tools", value: "ai-tools" },
+        { label: "Design Tools", value: "design-tools" },
+        { label: "Dev Tools", value: "dev-tools" },
+        { label: "Note Taking Apps", value: "note-taking-apps" },
+        { label: "Productivity Tools", value: "productivity-tools" },
+      ],
+    },
+  ];
+
   return (
-    <div>
-      <Hero title="Posts" subtitle="..." />
-      <div className="grid grid-cols-6 items-start gap-40">
-        <div className="col-span-4 space-y-10">
-          <div className="flex justify-between">
-            <div className="space-y-5 w-full">
-              <div className="flex items-center gap-5">
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="flex items-center gap-1">
-                    <span className="text-sm capitalize">{sorting}</span>
-                    <ChevronDownIcon className="size-5" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    {SORT_OPTIONS.map((option) => (
-                      <DropdownMenuCheckboxItem
-                        className="capitalize cursor-pointer"
-                        key={option}
-                        onCheckedChange={(checked: boolean) => {
-                          if (checked) {
-                            searchParams.set("sorting", option);
-                            setSearchParams(searchParams);
-                          }
-                        }}
-                      >
-                        {option}
-                      </DropdownMenuCheckboxItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                {sorting === "popular" && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger className="flex items-center gap-1">
-                      <span className="text-sm capitalize">{period}</span>
-                      <ChevronDownIcon className="size-5" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      {PERIOD_OPTIONS.map((option) => (
-                        <DropdownMenuCheckboxItem
-                          className="capitalize cursor-pointer"
-                          key={option}
-                          onCheckedChange={(checked: boolean) => {
-                            if (checked) {
-                              searchParams.set("period", option);
-                              setSearchParams(searchParams);
-                            }
-                          }}
-                        >
-                          {option}
-                        </DropdownMenuCheckboxItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
-              </div>
-              <Form className="w-2/3">
-                <Input
-                  type="text"
-                  name="search"
-                  placeholder="Search for discussions"
-                />
-              </Form>
-            </div>
-            <Button asChild>
-              <Link to={`/posts/new`}>Create Discussion</Link>
-            </Button>
-          </div>
-          <div className="space-y-5">
-            {Array.from({ length: 11 }).map((_, index) => (
-              <PostCard
-                key={`postId-${index}`}
-                id={`postId-${index}`}
-                title="What is the best place to go?"
-                body="I think the best place to go is sdf sdfdsfdsf"
-                visitedDate={new Date()}
-                weatherDescription="Sunny"
-                createdAt={new Date()}
-                createdBy={{
-                  id: "1",
-                  username: "Nico",
-                  profileImageUrl: "https://github.com/apple.png",
-                }}
-                viewpoint={{
-                  id: "1",
-                  title: "Productivity",
-                  locationName: "Productivity",
-                }}
-              />
-            ))}
-          </div>
-        </div>
-        <aside className="col-span-2 space-y-5">
-          <span className="text-sm font-bold text-muted-foreground uppercase">
-            Topics
-          </span>
-          <div className="flex flex-col gap-2 items-start">
-            {[
-              "AI Tools",
-              "Design Tools",
-              "Dev Tools",
-              "Note Taking Apps",
-              "Productivity Tools",
-            ].map((category) => (
-              <Button asChild variant={"link"} key={category} className="pl-0">
-                <Link to={`/posts?topic=${category}`}>{category}</Link>
-              </Button>
-            ))}
-          </div>
-        </aside>
+    <ContentLayout
+      title="Posts"
+      subtitle="Share your experiences and connect with others"
+      searchPlaceholder="Search posts..."
+      addButtonText="Add Post"
+      addButtonLink="/posts/new"
+      sortOptions={SORT_OPTIONS}
+      periodOptions={PERIOD_OPTIONS}
+      sidebarFilters={sidebarFilters}
+      currentSort={sorting}
+      currentPeriod={period}
+      searchValue={search}
+      onSearch={(value) => {
+        searchParams.set("search", value);
+        setSearchParams(searchParams);
+      }}
+      onSort={(value) => {
+        searchParams.set("sorting", value);
+        setSearchParams(searchParams);
+      }}
+      onPeriodChange={(value) => {
+        searchParams.set("period", value);
+        setSearchParams(searchParams);
+      }}
+    >
+      <div className="space-y-4">
+        {Array.from({ length: 11 }).map((_, index) => (
+          <PostCard
+            key={`postId-${index}`}
+            id={`postId-${index}`}
+            title="What is the best place to go?"
+            body="I think the best place to go is sdf sdfdsfdsf"
+            visitedDate={new Date()}
+            weatherDescription="Sunny"
+            createdAt={new Date()}
+            createdBy={{
+              id: "1",
+              username: "Nico",
+              profileImageUrl: "https://github.com/apple.png",
+            }}
+            viewpoint={{
+              id: "1",
+              title: "Productivity",
+              locationName: "Productivity",
+            }}
+          />
+        ))}
       </div>
-    </div>
+    </ContentLayout>
   );
 }

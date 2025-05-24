@@ -3,6 +3,7 @@ import {
   BarChart3Icon,
   BellIcon,
   LogOutIcon,
+  MenuIcon,
   MessageCircleIcon,
   SettingsIcon,
   UserIcon,
@@ -25,6 +26,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "./ui/navigation-menu";
+import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 
 import { Button } from "./ui/button";
 import { Link } from "react-router";
@@ -63,19 +65,9 @@ const menus = [
         to: "/trails",
       },
       {
-        name: "By Difficulty",
-        description: "Find trails by difficulty level",
-        to: "/trails/difficulty",
-      },
-      {
-        name: "By Season",
-        description: "Find trails suitable for each season",
-        to: "/trails/season",
-      },
-      {
         name: "Create Trail",
         description: "Register a new hiking trail",
-        to: "/trails/create",
+        to: "/trails/new",
       },
     ],
   },
@@ -105,19 +97,9 @@ const menus = [
         to: "/mypage/profile",
       },
       {
-        name: "My Trails",
-        description: "Manage your registered trails",
-        to: "/mypage/trails",
-      },
-      {
-        name: "My Posts",
-        description: "Manage your posts",
-        to: "/mypage/posts",
-      },
-      {
-        name: "Saved Viewpoints",
-        description: "View your saved viewpoints",
-        to: "/mypage/saved-viewpoints",
+        name: "Favorite",
+        description: "View your favorite viewpoints, trails, and posts",
+        to: "/mypage/favorite",
       },
     ],
   },
@@ -133,62 +115,75 @@ export default function Navigation({
   hasMessages: boolean;
 }) {
   return (
-    <nav className="flex px-20 h-16 items-center justify-between backdrop-blur fixed top-0 left-0 right-0 z-50 bg-background/50">
+    <nav className="flex px-4 sm:px-6 lg:px-20 h-16 items-center justify-between backdrop-blur fixed top-0 left-0 right-0 z-50 bg-background/50">
       <div className="flex items-center">
-        <Link to="/" className="font-bold tracking-tighter text-lg">
+        <Link
+          to="/"
+          className="font-bold tracking-tighter text-base sm:text-lg"
+        >
           Mounty
         </Link>
-        <Separator orientation="vertical" className="h-6 mx-4" />
-        <NavigationMenu>
-          <NavigationMenuList>
-            {menus.map((menu) => (
-              <NavigationMenuItem key={menu.name}>
-                {menu.items ? (
-                  <>
-                    <NavigationMenuTrigger>{menu.name}</NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                      <ul className="grid w-[600px] font-light gap-3 p-4 grid-cols-2">
-                        {menu.items?.map((item) => (
-                          <NavigationMenuItem
-                            key={item.name}
-                            className={cn([
-                              "select-none rounded-md transition-colors focus:bg-accent  hover:bg-accent",
-                              (item.to === "/products/promote" ||
-                                item.to === "/jobs/submit") &&
-                                "col-span-2 bg-primary/10 hover:bg-primary/20 focus:bg-primary/20",
-                            ])}
-                          >
-                            <NavigationMenuLink asChild>
-                              <Link
-                                className="p-3 space-y-1 block leading-none no-underline outline-none"
-                                to={item.to}
-                              >
-                                <span className="text-sm font-medium leading-none">
-                                  {item.name}
-                                </span>
-                                <p className="text-sm leading-snug text-muted-foreground">
-                                  {item.description}
-                                </p>
-                              </Link>
-                            </NavigationMenuLink>
-                          </NavigationMenuItem>
-                        ))}
-                      </ul>
-                    </NavigationMenuContent>
-                  </>
-                ) : (
-                  <Link className={navigationMenuTriggerStyle()} to={menu.to}>
-                    {menu.name}
-                  </Link>
-                )}
-              </NavigationMenuItem>
-            ))}
-          </NavigationMenuList>
-        </NavigationMenu>
+        <Separator
+          orientation="vertical"
+          className="h-6 mx-2 sm:mx-4 hidden sm:block"
+        />
+        <div className="hidden md:block">
+          <NavigationMenu>
+            <NavigationMenuList>
+              {menus.map((menu) => (
+                <NavigationMenuItem key={menu.name}>
+                  {menu.items ? (
+                    <>
+                      <NavigationMenuTrigger>{menu.name}</NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <ul className="grid w-[400px] sm:w-[600px] font-light gap-3 p-4 grid-cols-1 sm:grid-cols-2">
+                          {menu.items?.map((item) => (
+                            <NavigationMenuItem
+                              key={item.name}
+                              className={cn([
+                                "select-none rounded-md transition-colors focus:bg-accent hover:bg-accent",
+                                (item.to === "/products/promote" ||
+                                  item.to === "/jobs/submit") &&
+                                  "col-span-2 bg-primary/10 hover:bg-primary/20 focus:bg-primary/20",
+                              ])}
+                            >
+                              <NavigationMenuLink asChild>
+                                <Link
+                                  className="p-3 space-y-1 block leading-none no-underline outline-none"
+                                  to={item.to}
+                                >
+                                  <span className="text-sm font-medium leading-none">
+                                    {item.name}
+                                  </span>
+                                  <p className="text-sm leading-snug text-muted-foreground">
+                                    {item.description}
+                                  </p>
+                                </Link>
+                              </NavigationMenuLink>
+                            </NavigationMenuItem>
+                          ))}
+                        </ul>
+                      </NavigationMenuContent>
+                    </>
+                  ) : (
+                    <Link className={navigationMenuTriggerStyle()} to={menu.to}>
+                      {menu.name}
+                    </Link>
+                  )}
+                </NavigationMenuItem>
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
+        </div>
       </div>
       {isLoggedIn ? (
-        <div className="flex items-center gap-4">
-          <Button size="icon" variant="ghost" asChild className="relative">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <Button
+            size="icon"
+            variant="ghost"
+            asChild
+            className="relative hidden sm:flex"
+          >
             <Link to="/my/notifications">
               <BellIcon className="size-4" />
               {hasNotifications && (
@@ -196,7 +191,12 @@ export default function Navigation({
               )}
             </Link>
           </Button>
-          <Button size="icon" variant="ghost" asChild className="relative">
+          <Button
+            size="icon"
+            variant="ghost"
+            asChild
+            className="relative hidden sm:flex"
+          >
             <Link to="/my/messages">
               <MessageCircleIcon className="size-4" />
               {hasMessages && (
@@ -206,7 +206,7 @@ export default function Navigation({
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Avatar className="cursor-pointer">
+              <Avatar className="cursor-pointer size-8 sm:size-10">
                 <AvatarImage src="https://github.com/haneulee.png" />
                 <AvatarFallback>N</AvatarFallback>
               </Avatar>
@@ -248,13 +248,64 @@ export default function Navigation({
           </DropdownMenu>
         </div>
       ) : (
-        <div className="flex items-center gap-4">
-          <Button asChild variant="secondary">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <Button
+            asChild
+            variant="secondary"
+            size="sm"
+            className="hidden sm:flex"
+          >
             <Link to="/auth/login">Login</Link>
           </Button>
-          <Button asChild>
+          <Button asChild size="sm" className="hidden sm:flex">
             <Link to="/auth/join">Join</Link>
           </Button>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="sm:hidden">
+                <MenuIcon className="size-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0">
+              <div className="flex flex-col h-full">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+                  <div className="space-y-8 pt-4">
+                    {menus.map((menu) => (
+                      <div key={menu.name} className="space-y-3">
+                        <h3 className="font-medium text-base">{menu.name}</h3>
+                        <div className="space-y-2">
+                          {menu.items?.map((item) => (
+                            <Link
+                              key={item.name}
+                              to={item.to}
+                              className="block text-sm text-muted-foreground hover:text-foreground py-1.5"
+                            >
+                              {item.name}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="p-4 sm:p-6 border-t">
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      asChild
+                      variant="secondary"
+                      size="sm"
+                      className="w-full"
+                    >
+                      <Link to="/auth/login">Login</Link>
+                    </Button>
+                    <Button asChild size="sm" className="w-full">
+                      <Link to="/auth/join">Join</Link>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       )}
     </nav>
