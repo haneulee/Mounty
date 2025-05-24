@@ -25,7 +25,7 @@ export const meta: Route.MetaFunction = () => {
 
 export default function HomePage({ loaderData }: Route.ComponentProps) {
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-8 sm:space-y-12">
+    <div className="p-4 sm:p-6 lg:p-20 space-y-8 sm:space-y-12">
       <section>
         <div className="space-y-4 sm:space-y-6 lg:space-y-8">
           <div className="space-y-2 sm:space-y-4">

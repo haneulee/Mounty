@@ -13,6 +13,8 @@ import {
 
 import { Button } from "~/common/components/ui/button";
 import { Input } from "~/common/components/ui/input";
+import { Link } from "react-router";
+import { LogOutIcon } from "lucide-react";
 import { MyContent } from "~/features/users/components/my-content";
 import type { Route } from "~/types";
 import { Separator } from "~/common/components/ui/separator";
@@ -208,31 +210,52 @@ export default function MyProfilePage({ loaderData }: Route.ComponentProps) {
             </Avatar>
           </div>
           <div className="flex-grow text-center sm:text-left">
-            <h1 className="text-2xl sm:text-3xl font-bold mb-2">
-              {user.username}
-            </h1>
-            <p className="text-muted-foreground mb-4">{user.bio}</p>
-            <div className="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-6">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-4">
               <div>
-                <div className="font-medium">{user.followersCount}</div>
-                <div className="text-sm text-muted-foreground">Followers</div>
+                <h1 className="text-2xl sm:text-3xl font-bold mb-2">
+                  {user.username}
+                </h1>
+                <p className="text-muted-foreground mb-4">{user.bio}</p>
+                <div className="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-6">
+                  <div>
+                    <div className="font-medium">{user.followersCount}</div>
+                    <div className="text-sm text-muted-foreground">
+                      Followers
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-medium">{user.followingCount}</div>
+                    <div className="text-sm text-muted-foreground">
+                      Following
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-medium">{user.postsCount}</div>
+                    <div className="text-sm text-muted-foreground">Posts</div>
+                  </div>
+                  <div>
+                    <div className="font-medium">{user.trailsCount}</div>
+                    <div className="text-sm text-muted-foreground">Trails</div>
+                  </div>
+                  <div>
+                    <div className="font-medium">{user.viewpointsCount}</div>
+                    <div className="text-sm text-muted-foreground">
+                      Viewpoints
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div>
-                <div className="font-medium">{user.followingCount}</div>
-                <div className="text-sm text-muted-foreground">Following</div>
-              </div>
-              <div>
-                <div className="font-medium">{user.postsCount}</div>
-                <div className="text-sm text-muted-foreground">Posts</div>
-              </div>
-              <div>
-                <div className="font-medium">{user.trailsCount}</div>
-                <div className="text-sm text-muted-foreground">Trails</div>
-              </div>
-              <div>
-                <div className="font-medium">{user.viewpointsCount}</div>
-                <div className="text-sm text-muted-foreground">Viewpoints</div>
-              </div>
+              <Button
+                asChild
+                variant="destructive"
+                size="sm"
+                className="w-full sm:w-auto"
+              >
+                <Link to="/auth/logout">
+                  <LogOutIcon className="size-4 mr-2" />
+                  Logout
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
