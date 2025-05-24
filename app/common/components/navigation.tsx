@@ -34,6 +34,7 @@ import { HyperText } from "./ui/hyper-text";
 import { Link } from "react-router";
 import { Separator } from "~/common/components/ui/separator";
 import { cn } from "~/lib/utils";
+import { useState } from "react";
 
 const menus = [
   {
@@ -116,6 +117,8 @@ export default function Navigation({
   hasNotifications: boolean;
   hasMessages: boolean;
 }) {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <nav className="flex px-4 sm:px-6 lg:px-20 h-16 items-center justify-between backdrop-blur fixed top-0 left-0 right-0 z-50 bg-background/50">
       <div className="flex items-center">
@@ -254,7 +257,7 @@ export default function Navigation({
           <Button asChild size="sm" className="hidden sm:flex">
             <Link to="/auth/join">Join</Link>
           </Button>
-          <Sheet>
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="sm:hidden">
                 <MenuIcon className="size-5" />
@@ -281,6 +284,7 @@ export default function Navigation({
                               key={item.name}
                               to={item.to}
                               className="block text-sm text-muted-foreground hover:text-foreground py-1.5"
+                              onClick={() => setIsOpen(false)}
                             >
                               {item.name}
                             </Link>
@@ -298,10 +302,14 @@ export default function Navigation({
                       size="sm"
                       className="w-full"
                     >
-                      <Link to="/auth/login">Login</Link>
+                      <Link to="/auth/login" onClick={() => setIsOpen(false)}>
+                        Login
+                      </Link>
                     </Button>
                     <Button asChild size="sm" className="w-full">
-                      <Link to="/auth/join">Join</Link>
+                      <Link to="/auth/join" onClick={() => setIsOpen(false)}>
+                        Join
+                      </Link>
                     </Button>
                   </div>
                 </div>
