@@ -20,9 +20,7 @@ export default [
     ...prefix("map", [
       index("features/viewpoints/pages/viewpoints-map-page.tsx"),
     ]),
-    ...prefix("popular", [
-      index("features/viewpoints/pages/viewpoints-popular-page.tsx"),
-    ]),
+    route("/new", "features/viewpoints/pages/submit-viewpoint-page.tsx"),
   ]),
 
   // Trails routes
@@ -42,15 +40,8 @@ export default [
   // Posts routes
   ...prefix("posts", [
     index("features/community/pages/community-page.tsx"),
-    ...prefix("new", [
-      index("features/community/pages/community-new-page.tsx"),
-    ]),
-    ...prefix("popular", [
-      index("features/community/pages/community-popular-page.tsx"),
-    ]),
-    ...prefix("create", [
-      index("features/community/pages/community-create-page.tsx"),
-    ]),
+    route("/:postId", "features/community/pages/post-page.tsx"),
+    route("/new", "features/community/pages/submit-post-page.tsx"),
   ]),
 
   // My Page routes

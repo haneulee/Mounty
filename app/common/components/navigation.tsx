@@ -47,9 +47,9 @@ const menus = [
         to: "/viewpoints/map",
       },
       {
-        name: "Popular Viewpoints",
-        description: "See the most visited viewpoints",
-        to: "/viewpoints/popular",
+        name: "Add Viewpoint",
+        description: "Register a new viewpoint",
+        to: "/viewpoints/new",
       },
     ],
   },
@@ -89,19 +89,9 @@ const menus = [
         to: "/posts",
       },
       {
-        name: "Latest Posts",
-        description: "Check newly created posts",
-        to: "/posts/new",
-      },
-      {
-        name: "Popular Posts",
-        description: "See the most popular posts",
-        to: "/posts/popular",
-      },
-      {
         name: "Create Post",
         description: "Write a new post",
-        to: "/posts/create",
+        to: "/posts/new",
       },
     ],
   },

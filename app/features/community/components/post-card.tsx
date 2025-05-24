@@ -86,7 +86,7 @@ export function PostCard({
           <span>{formatDistanceToNow(createdAt, { addSuffix: true })}</span>
         </div>
         <Button variant="link" asChild>
-          <Link to={`/community/${id}`}>Read more &rarr;</Link>
+          <Link to={`/posts/${id}`}>Read more &rarr;</Link>
         </Button>
       </CardFooter>
     </Card>

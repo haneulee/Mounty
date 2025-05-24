@@ -25,7 +25,7 @@ export default function OtpPage() {
             id="email"
             required
             type="email"
-            placeholder="i.e wemake@example.com"
+            placeholder="test@example.com"
           />
           <InputPair
             label="OTP"
@@ -34,7 +34,7 @@ export default function OtpPage() {
             id="otp"
             required
             type="number"
-            placeholder="i.e 1234"
+            placeholder="1234"
           />
           <Button className="w-full" type="submit">
             Log in

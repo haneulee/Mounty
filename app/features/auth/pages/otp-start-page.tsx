@@ -25,7 +25,7 @@ export default function OtpStartPage() {
             id="email"
             required
             type="email"
-            placeholder="i.e wemake@example.com"
+            placeholder="itest@example.com"
           />
           <Button className="w-full" type="submit">
             Send OTP
