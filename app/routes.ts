@@ -1,4 +1,10 @@
-import { type RouteConfig, index, prefix } from "@react-router/dev/routes";
+import {
+  type RouteConfig,
+  index,
+  layout,
+  prefix,
+  route,
+} from "@react-router/dev/routes";
 
 export default [
   index("common/pages/home-page.tsx"),
@@ -59,8 +65,20 @@ export default [
 
   // Auth routes
   ...prefix("auth", [
-    ...prefix("login", [index("features/auth/pages/login-page.tsx")]),
-    ...prefix("join", [index("features/auth/pages/join-page.tsx")]),
-    ...prefix("logout", [index("features/auth/pages/logout-page.tsx")]),
+    layout("features/auth/layouts/auth-layout.tsx", [
+      ...prefix("login", [index("features/auth/pages/login-page.tsx")]),
+      ...prefix("join", [
+        index("features/auth/pages/join-page.tsx"),
+        ...prefix("/otp", [
+          route("/start", "features/auth/pages/otp-start-page.tsx"),
+          route("/complete", "features/auth/pages/otp-complete-page.tsx"),
+        ]),
+        ...prefix("/social/:provider", [
+          route("/start", "features/auth/pages/social-start-page.tsx"),
+          route("/complete", "features/auth/pages/social-complete-page.tsx"),
+        ]),
+      ]),
+      ...prefix("logout", [index("features/auth/pages/logout-page.tsx")]),
+    ]),
   ]),
 ] satisfies RouteConfig;
