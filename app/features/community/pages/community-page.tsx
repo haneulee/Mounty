@@ -1,6 +1,7 @@
 import { ContentLayout } from "~/common/components/layout/content-layout";
 import { PostCard } from "../components/post-card";
 import type { Route } from "./+types/community-page";
+import { useGetCommunityPosts } from "../queries";
 import { useSearchParams } from "react-router";
 
 interface FilterOption {
@@ -25,7 +26,12 @@ export const meta: Route.MetaFunction = () => {
   return [{ title: "Community | Mounty" }];
 };
 
-export default function CommunityPage() {
+export const loader = async () => {
+  const posts = await useGetCommunityPosts();
+  return { posts };
+};
+
+export default function CommunityPage({ loaderData }: Route.ComponentProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const sorting = searchParams.get("sorting") || "newest";
   const period = searchParams.get("period") || "all";
@@ -72,26 +78,8 @@ export default function CommunityPage() {
       }}
     >
       <div className="space-y-4">
-        {Array.from({ length: 11 }).map((_, index) => (
-          <PostCard
-            key={`postId-${index}`}
-            id={`postId-${index}`}
-            title="Unforgettable Sunrise at Bukhansan Peak"
-            body="Started our hike at 4 AM and reached the summit just in time for sunrise. The winter snow made the view even more magical. A moment I'll never forget!"
-            visitedDate={new Date()}
-            weatherDescription="Clear"
-            createdAt={new Date()}
-            createdBy={{
-              id: "1",
-              username: "MountainExplorer",
-              profileImageUrl: "https://github.com/apple.png",
-            }}
-            viewpoint={{
-              id: "1",
-              title: "Bukhansan Summit",
-              locationName: "Bukhansan National Park",
-            }}
-          />
+        {loaderData.posts.map((post) => (
+          <PostCard key={post.id} post={{ ...post, id: String(post.id) }} />
         ))}
       </div>
     </ContentLayout>
