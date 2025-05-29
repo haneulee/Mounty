@@ -24,8 +24,29 @@ const PERIOD_OPTIONS: FilterOption[] = [
 ];
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const viewpoints = await useGetViewpoints();
-  return { viewpoints };
+  const url = new URL(request.url);
+  const page = parseInt(url.searchParams.get("page") || "1", 10);
+  const sortBy = (url.searchParams.get("sorting") || "newest") as
+    | "newest"
+    | "popular"
+    | "rating";
+  const period = (url.searchParams.get("period") || "all") as
+    | "all"
+    | "week"
+    | "month"
+    | "year";
+
+  const {
+    data: viewpoints,
+    totalPages,
+    currentPage,
+  } = await useGetViewpoints({
+    page,
+    sortBy,
+    period,
+  });
+
+  return { viewpoints, totalPages, currentPage };
 }
 
 export function action({ request }: Route.ActionArgs) {
@@ -47,32 +68,7 @@ export default function ViewpointsPage({ loaderData }: Route.ComponentProps) {
   const sorting = searchParams.get("sorting") || "newest";
   const period = searchParams.get("period") || "all";
   const search = searchParams.get("search") || "";
-
-  const sidebarFilters = [
-    {
-      title: "View Type",
-      type: "link" as const,
-      options: [
-        { label: "Mountain", value: "mountain" },
-        { label: "Ocean", value: "ocean" },
-        { label: "City", value: "city" },
-        { label: "Forest", value: "forest" },
-        { label: "Desert", value: "desert" },
-        { label: "Lake", value: "lake" },
-      ],
-    },
-    {
-      title: "Popular Tags",
-      type: "tag" as const,
-      options: [
-        { label: "Panoramic", value: "panoramic" },
-        { label: "Scenic", value: "scenic" },
-        { label: "Photography", value: "photography" },
-        { label: "Hiking", value: "hiking" },
-        { label: "Nature", value: "nature" },
-      ],
-    },
-  ];
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
   return (
     <ContentLayout
@@ -83,22 +79,31 @@ export default function ViewpointsPage({ loaderData }: Route.ComponentProps) {
       addButtonLink="/viewpoints/new"
       sortOptions={SORT_OPTIONS}
       periodOptions={PERIOD_OPTIONS}
-      sidebarFilters={sidebarFilters}
+      sidebarFilters={[]}
       currentSort={sorting}
       currentPeriod={period}
       searchValue={search}
       onSearch={(value) => {
         searchParams.set("search", value);
+        searchParams.set("page", "1");
         setSearchParams(searchParams);
       }}
       onSort={(value) => {
         searchParams.set("sorting", value);
+        searchParams.set("page", "1");
         setSearchParams(searchParams);
       }}
       onPeriodChange={(value) => {
         searchParams.set("period", value);
+        searchParams.set("page", "1");
         setSearchParams(searchParams);
       }}
+      onPageChange={(page) => {
+        searchParams.set("page", page.toString());
+        setSearchParams(searchParams);
+      }}
+      currentPage={currentPage}
+      totalPages={loaderData.totalPages}
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
         {loaderData.viewpoints.map(

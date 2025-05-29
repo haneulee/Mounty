@@ -8,12 +8,6 @@ import {
 
 export default [
   index("common/pages/home-page.tsx"),
-
-  // Chrome DevTools route
-  ...prefix(".well-known/appspecific", [
-    index("common/pages/devtools-page.tsx"),
-  ]),
-
   // Viewpoints routes
   ...prefix("viewpoints", [
     index("features/viewpoints/pages/viewpoints-page.tsx"),

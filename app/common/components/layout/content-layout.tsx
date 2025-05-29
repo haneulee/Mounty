@@ -38,9 +38,12 @@ interface ContentLayoutProps {
   onSearch: (value: string) => void;
   onSort: (value: string) => void;
   onPeriodChange?: (value: string) => void;
+  onPageChange?: (page: number) => void;
   currentSort: string;
   currentPeriod?: string;
   searchValue: string;
+  currentPage?: number;
+  totalPages?: number;
 }
 
 export function ContentLayout({
@@ -56,9 +59,12 @@ export function ContentLayout({
   onSearch,
   onSort,
   onPeriodChange,
+  onPageChange,
   currentSort,
   currentPeriod,
   searchValue,
+  currentPage,
+  totalPages,
 }: ContentLayoutProps) {
   return (
     <div className="min-h-screen">
@@ -147,6 +153,25 @@ export function ContentLayout({
             </div>
 
             {children}
+
+            {onPageChange && currentPage && totalPages && (
+              <div className="flex justify-center mt-8">
+                <div className="flex gap-2">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (page) => (
+                      <Button
+                        key={page}
+                        variant={currentPage === page ? "default" : "outline"}
+                        onClick={() => onPageChange(page)}
+                        className="w-10 h-10"
+                      >
+                        {page}
+                      </Button>
+                    )
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {sidebarFilters.length > 0 && (

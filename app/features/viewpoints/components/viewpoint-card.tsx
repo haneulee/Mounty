@@ -3,18 +3,10 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "~/common/components/ui/avatar";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "~/common/components/ui/card";
-import { ClockIcon, MapPinIcon, StarIcon } from "lucide-react";
 import { formatDistanceToNow, parseISO } from "date-fns";
 
 import { Badge } from "~/common/components/ui/badge";
+import { Card } from "~/common/components/ui/card";
 import type { Database } from "~/supa-client";
 import { Link } from "react-router";
 
