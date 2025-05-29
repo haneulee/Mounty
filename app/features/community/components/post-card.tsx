@@ -11,61 +11,78 @@ import {
 } from "~/common/components/ui/card";
 
 import { Badge } from "~/common/components/ui/badge";
+import { Button } from "~/common/components/ui/button";
+import type { Database } from "~/database.types";
 import { Link } from "react-router";
+import { ThumbsUp } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 interface PostCardProps {
-  post: {
-    id: string;
-    title: string;
-    content: string;
-    createdAt: Date;
-    updatedAt: Date;
-    viewpoint: string;
-    author: string;
-    username: string;
-    upvotes: number;
+  post: Database["public"]["Tables"]["posts"]["Row"] & {
+    profiles?: { username: string; photos?: { url: string }[] } | null;
+    viewpoint_title?: string | null;
+    upvote_count?: number;
   };
 }
 
 export function PostCard({ post }: PostCardProps) {
-  const { id, title, content, createdAt, viewpoint, username, upvotes } = post;
+  if (!post) return null;
+
+  const {
+    post_id,
+    title,
+    content,
+    created_at,
+    profiles,
+    viewpoint_title,
+    upvote_count,
+  } = post;
+
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="p-3 sm:p-4 space-y-2">
-        <div className="flex items-center gap-2">
-          <Avatar className="size-6 sm:size-8">
-            {/* <AvatarImage src={createdBy.profileImageUrl} /> */}
-            <AvatarFallback>{username}</AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs sm:text-sm font-medium truncate">
-              {username}
-            </p>
-            <p className="text-xs text-muted-foreground truncate">
-              {formatDistanceToNow(createdAt, { addSuffix: true })}
-            </p>
+    <div className="flex gap-4">
+      <Card className="flex-1 flex flex-col">
+        <CardHeader className="p-3 sm:p-4 space-y-2">
+          <div className="flex items-center gap-3 justify-between">
+            <div className="flex items-center gap-2 min-w-0">
+              <Avatar className="size-7 sm:size-8">
+                <AvatarImage src={profiles?.photos?.[0]?.url} />
+                <AvatarFallback>
+                  {profiles?.username?.[0]?.toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <span className="text-xs sm:text-sm font-medium truncate block">
+                  {profiles?.username}
+                </span>
+                <span className="text-xs text-muted-foreground truncate block">
+                  {formatDistanceToNow(created_at, { addSuffix: true })}
+                </span>
+              </div>
+            </div>
+            {viewpoint_title && (
+              <Badge variant="outline" className="text-xs whitespace-nowrap">
+                {viewpoint_title}
+              </Badge>
+            )}
           </div>
-        </div>
-        <Link to={`/posts/${id}`} className="block">
-          <h3 className="text-sm sm:text-base font-semibold line-clamp-2">
-            {title}
-          </h3>
-        </Link>
-      </CardHeader>
-      <CardContent className="p-3 sm:p-4 flex-1">
-        <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 sm:line-clamp-3">
-          {content}
-        </p>
-      </CardContent>
-      <CardFooter className="p-3 sm:p-4 pt-0 flex flex-wrap gap-2">
-        <Badge variant="secondary" className="text-xs">
-          {/* {weatherDescription} */}
-        </Badge>
-        <Badge variant="outline" className="text-xs">
-          {viewpoint}
-        </Badge>
-      </CardFooter>
-    </Card>
+          <Link to={`/posts/${post_id}`} className="block mt-2">
+            <h3 className="text-sm sm:text-base font-semibold line-clamp-2">
+              {title}
+            </h3>
+          </Link>
+        </CardHeader>
+        <CardContent className="p-3 sm:p-4 flex-1">
+          <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 sm:line-clamp-3">
+            {content}
+          </p>
+        </CardContent>
+      </Card>
+      <div className="flex flex-col items-center justify-center gap-1 w-16">
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+          <ThumbsUp className="size-4" />
+        </Button>
+        <span className="text-sm font-medium">{upvote_count ?? 0}</span>
+      </div>
+    </div>
   );
 }

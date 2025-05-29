@@ -65,8 +65,16 @@ export function ContentLayout({
       <Particles className="opacity-30" />
       <Hero title={title} subtitle={subtitle} />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8">
-          <div className="flex-grow">
+        <div
+          className={`flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8 ${
+            sidebarFilters.length === 0 ? "lg:justify-center" : ""
+          }`}
+        >
+          <div
+            className={`flex-grow ${
+              sidebarFilters.length === 0 ? "max-w-4xl" : ""
+            }`}
+          >
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
               <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold">
                 {title}
@@ -141,44 +149,48 @@ export function ContentLayout({
             {children}
           </div>
 
-          <div className="w-full lg:w-64 space-y-4 sm:space-y-6">
-            {sidebarFilters.map((filter) => (
-              <Card key={filter.title}>
-                <CardHeader className="p-3 sm:p-4">
-                  <h2 className="text-base sm:text-lg font-semibold">
-                    {filter.title}
-                  </h2>
-                </CardHeader>
-                <CardContent className="p-3 sm:p-4">
-                  {filter.type === "link" ? (
-                    <div className="space-y-1 sm:space-y-2">
-                      {filter.options.map((option) => (
-                        <Link
-                          key={option.value}
-                          to={`?${filter.title.toLowerCase()}=${option.value}`}
-                          className="block text-xs sm:text-sm text-muted-foreground hover:text-primary capitalize"
-                        >
-                          {option.label}
-                        </Link>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="flex flex-wrap gap-1 sm:gap-2">
-                      {filter.options.map((option) => (
-                        <Link
-                          key={option.value}
-                          to={`?tag=${option.value}`}
-                          className="text-xs sm:text-sm text-muted-foreground hover:text-primary"
-                        >
-                          #{option.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {sidebarFilters.length > 0 && (
+            <div className="w-full lg:w-64 space-y-4 sm:space-y-6">
+              {sidebarFilters.map((filter) => (
+                <Card key={filter.title}>
+                  <CardHeader className="p-3 sm:p-4">
+                    <h2 className="text-base sm:text-lg font-semibold">
+                      {filter.title}
+                    </h2>
+                  </CardHeader>
+                  <CardContent className="p-3 sm:p-4">
+                    {filter.type === "link" ? (
+                      <div className="space-y-1 sm:space-y-2">
+                        {filter.options.map((option) => (
+                          <Link
+                            key={option.value}
+                            to={`?${filter.title.toLowerCase()}=${
+                              option.value
+                            }`}
+                            className="block text-xs sm:text-sm text-muted-foreground hover:text-primary capitalize"
+                          >
+                            {option.label}
+                          </Link>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="flex flex-wrap gap-1 sm:gap-2">
+                        {filter.options.map((option) => (
+                          <Link
+                            key={option.value}
+                            to={`?tag=${option.value}`}
+                            className="text-xs sm:text-sm text-muted-foreground hover:text-primary"
+                          >
+                            #{option.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
       </main>
     </div>

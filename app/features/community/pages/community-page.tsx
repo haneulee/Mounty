@@ -11,8 +11,8 @@ interface FilterOption {
 
 const SORT_OPTIONS: FilterOption[] = [
   { label: "Latest", value: "newest" },
-  { label: "Trending", value: "popular" },
-  { label: "Top Rated", value: "rating" },
+  { label: "Popular", value: "popular" },
+  { label: "Most Comments", value: "comments" },
 ];
 
 const PERIOD_OPTIONS: FilterOption[] = [
@@ -37,30 +37,16 @@ export default function CommunityPage({ loaderData }: Route.ComponentProps) {
   const period = searchParams.get("period") || "all";
   const search = searchParams.get("search") || "";
 
-  const sidebarFilters = [
-    {
-      title: "Categories",
-      type: "link" as const,
-      options: [
-        { label: "Viewpoint Reviews", value: "viewpoint-reviews" },
-        { label: "Hiking Tips", value: "hiking-tips" },
-        { label: "Gear Reviews", value: "gear-reviews" },
-        { label: "Weather Updates", value: "weather-updates" },
-        { label: "Trail Stories", value: "trail-stories" },
-      ],
-    },
-  ];
-
   return (
     <ContentLayout
       title="Community"
-      subtitle="Share your hiking adventures with fellow mountaineers"
-      searchPlaceholder="Search stories, tips, and reviews..."
-      addButtonText="Share Story"
+      subtitle="Share your hiking experiences and stories"
+      searchPlaceholder="Search posts..."
+      addButtonText="Write Post"
       addButtonLink="/posts/new"
       sortOptions={SORT_OPTIONS}
       periodOptions={PERIOD_OPTIONS}
-      sidebarFilters={sidebarFilters}
+      sidebarFilters={[]}
       currentSort={sorting}
       currentPeriod={period}
       searchValue={search}
@@ -79,7 +65,7 @@ export default function CommunityPage({ loaderData }: Route.ComponentProps) {
     >
       <div className="space-y-4">
         {loaderData.posts.map((post) => (
-          <PostCard key={post.id} post={{ ...post, id: String(post.id) }} />
+          <PostCard key={post.post_id} post={post} />
         ))}
       </div>
     </ContentLayout>

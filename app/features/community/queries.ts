@@ -1,28 +1,50 @@
-import { asc, count, eq } from "drizzle-orm";
-import { postUpvotes, posts } from "./schema";
+import type { Database } from "~/database.types";
+import { supabase } from "~/supa-client";
 
-import db from "~/db";
-import { profiles } from "../users/schema";
-import { viewpoints } from "../viewpoints/schema";
+export async function useGetCommunityPosts() {
+  // 1. posts + profiles + viewpoints 조인
+  const { data: posts } = await supabase
+    .from("posts")
+    .select(
+      `
+      *,
+      profiles:created_by!inner (
+        username,
+        profile_id
+      ),
+      viewpoints:viewpoint_id!inner (
+        title
+      ),
+      post_upvotes (
+        profile_id
+      )
+    `
+    )
+    .order("created_at", { ascending: false });
 
-export const useGetCommunityPosts = async () => {
-  const allPosts = await db
-    .select({
-      id: posts.post_id,
-      title: posts.title,
-      content: posts.content,
-      createdAt: posts.created_at,
-      updatedAt: posts.updated_at,
-      viewpoint: viewpoints.title,
-      author: profiles.name,
-      username: profiles.username,
-      upvotes: count(postUpvotes.post_id),
-    })
-    .from(posts)
-    .innerJoin(viewpoints, eq(posts.viewpoint_id, viewpoints.id))
-    .innerJoin(profiles, eq(posts.created_by, profiles.profile_id))
-    .leftJoin(postUpvotes, eq(posts.post_id, postUpvotes.post_id))
-    .groupBy(posts.post_id, profiles.name, profiles.username, viewpoints.title)
-    .orderBy(asc(posts.post_id));
-  return allPosts;
-};
+  if (!posts) return [];
+
+  // 2. 모든 profile_id 추출
+  const profileIds = posts
+    .map((post) => post.profiles?.profile_id)
+    .filter(Boolean);
+
+  // 3. 해당 profile_id의 photos(프로필 사진) 한 번에 조회
+  const { data: photos } = await supabase
+    .from("photos")
+    .select("url,profile_id")
+    .in("profile_id", profileIds);
+
+  // 4. posts와 photos 매칭
+  return posts.map((post) => ({
+    ...post,
+    username: post.profiles?.username,
+    avatar_url:
+      photos?.find((photo) => photo.profile_id === post.profiles?.profile_id)
+        ?.url ?? null,
+    viewpoint_title: post.viewpoints?.title,
+    upvote_count: Array.isArray(post.post_upvotes)
+      ? post.post_upvotes.length
+      : 0,
+  }));
+}
