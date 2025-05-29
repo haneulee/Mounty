@@ -12,17 +12,25 @@ import {
 
 import { Badge } from "~/common/components/ui/badge";
 import { Button } from "~/common/components/ui/button";
-import type { Database } from "~/database.types";
 import { Link } from "react-router";
 import { ThumbsUp } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
+interface Post {
+  post_id: number | null;
+  title: string | null;
+  content: string | null;
+  created_at: string | null;
+  created_by: string | null;
+  viewpoint_id: string | null;
+  username: string | null;
+  avatar_url: string | null;
+  viewpoint_title: string | null;
+  upvote_count: number | null;
+}
+
 interface PostCardProps {
-  post: Database["public"]["Tables"]["posts"]["Row"] & {
-    profiles?: { username: string; photos?: { url: string }[] } | null;
-    viewpoint_title?: string | null;
-    upvote_count?: number;
-  };
+  post: Post;
 }
 
 export function PostCard({ post }: PostCardProps) {
@@ -33,7 +41,8 @@ export function PostCard({ post }: PostCardProps) {
     title,
     content,
     created_at,
-    profiles,
+    username,
+    avatar_url,
     viewpoint_title,
     upvote_count,
   } = post;
@@ -45,17 +54,21 @@ export function PostCard({ post }: PostCardProps) {
           <div className="flex items-center gap-3 justify-between">
             <div className="flex items-center gap-2 min-w-0">
               <Avatar className="size-7 sm:size-8">
-                <AvatarImage src={profiles?.photos?.[0]?.url} />
+                <AvatarImage src={avatar_url ?? undefined} />
                 <AvatarFallback>
-                  {profiles?.username?.[0]?.toUpperCase()}
+                  {username?.[0]?.toUpperCase() ?? "U"}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
                 <span className="text-xs sm:text-sm font-medium truncate block">
-                  {profiles?.username}
+                  {username}
                 </span>
                 <span className="text-xs text-muted-foreground truncate block">
-                  {formatDistanceToNow(created_at, { addSuffix: true })}
+                  {created_at
+                    ? formatDistanceToNow(new Date(created_at), {
+                        addSuffix: true,
+                      })
+                    : ""}
                 </span>
               </div>
             </div>

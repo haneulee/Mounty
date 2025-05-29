@@ -18,6 +18,7 @@ export const posts = pgTable("posts", {
   content: text().notNull(),
   created_at: timestamp().notNull().defaultNow(),
   updated_at: timestamp().notNull().defaultNow(),
+  upvotes: integer("upvotes").notNull().default(0),
   viewpoint_id: uuid().references(() => viewpoints.id, {
     onDelete: "cascade",
   }),

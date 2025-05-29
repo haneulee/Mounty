@@ -30,7 +30,21 @@ export type Database = {
             foreignKeyName: "follows_follower_id_profiles_profile_id_fk"
             columns: ["follower_id"]
             isOneToOne: false
+            referencedRelation: "community_post_list_view"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "follows_follower_id_profiles_profile_id_fk"
+            columns: ["follower_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "follows_following_id_profiles_profile_id_fk"
+            columns: ["following_id"]
+            isOneToOne: false
+            referencedRelation: "community_post_list_view"
             referencedColumns: ["profile_id"]
           },
           {
@@ -78,7 +92,21 @@ export type Database = {
             foreignKeyName: "notifications_recipient_id_profiles_profile_id_fk"
             columns: ["recipient_id"]
             isOneToOne: false
+            referencedRelation: "community_post_list_view"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "notifications_recipient_id_profiles_profile_id_fk"
+            columns: ["recipient_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "notifications_sender_id_profiles_profile_id_fk"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "community_post_list_view"
             referencedColumns: ["profile_id"]
           },
           {
@@ -132,8 +160,22 @@ export type Database = {
             foreignKeyName: "photos_post_id_posts_post_id_fk"
             columns: ["post_id"]
             isOneToOne: false
+            referencedRelation: "community_post_list_view"
+            referencedColumns: ["post_id"]
+          },
+          {
+            foreignKeyName: "photos_post_id_posts_post_id_fk"
+            columns: ["post_id"]
+            isOneToOne: false
             referencedRelation: "posts"
             referencedColumns: ["post_id"]
+          },
+          {
+            foreignKeyName: "photos_profile_id_profiles_profile_id_fk"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "community_post_list_view"
+            referencedColumns: ["profile_id"]
           },
           {
             foreignKeyName: "photos_profile_id_profiles_profile_id_fk"
@@ -201,8 +243,22 @@ export type Database = {
             foreignKeyName: "post_replies_post_id_posts_post_id_fk"
             columns: ["post_id"]
             isOneToOne: false
+            referencedRelation: "community_post_list_view"
+            referencedColumns: ["post_id"]
+          },
+          {
+            foreignKeyName: "post_replies_post_id_posts_post_id_fk"
+            columns: ["post_id"]
+            isOneToOne: false
             referencedRelation: "posts"
             referencedColumns: ["post_id"]
+          },
+          {
+            foreignKeyName: "post_replies_profile_id_profiles_profile_id_fk"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "community_post_list_view"
+            referencedColumns: ["profile_id"]
           },
           {
             foreignKeyName: "post_replies_profile_id_profiles_profile_id_fk"
@@ -238,6 +294,13 @@ export type Database = {
             foreignKeyName: "post_reply_upvotes_profile_id_profiles_profile_id_fk"
             columns: ["profile_id"]
             isOneToOne: false
+            referencedRelation: "community_post_list_view"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "post_reply_upvotes_profile_id_profiles_profile_id_fk"
+            columns: ["profile_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["profile_id"]
           },
@@ -261,8 +324,22 @@ export type Database = {
             foreignKeyName: "post_upvotes_post_id_posts_post_id_fk"
             columns: ["post_id"]
             isOneToOne: false
+            referencedRelation: "community_post_list_view"
+            referencedColumns: ["post_id"]
+          },
+          {
+            foreignKeyName: "post_upvotes_post_id_posts_post_id_fk"
+            columns: ["post_id"]
+            isOneToOne: false
             referencedRelation: "posts"
             referencedColumns: ["post_id"]
+          },
+          {
+            foreignKeyName: "post_upvotes_profile_id_profiles_profile_id_fk"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "community_post_list_view"
+            referencedColumns: ["profile_id"]
           },
           {
             foreignKeyName: "post_upvotes_profile_id_profiles_profile_id_fk"
@@ -302,6 +379,13 @@ export type Database = {
           viewpoint_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "posts_created_by_profiles_profile_id_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "community_post_list_view"
+            referencedColumns: ["profile_id"]
+          },
           {
             foreignKeyName: "posts_created_by_profiles_profile_id_fk"
             columns: ["created_by"]
@@ -429,6 +513,13 @@ export type Database = {
             foreignKeyName: "trails_created_by_profiles_profile_id_fk"
             columns: ["created_by"]
             isOneToOne: false
+            referencedRelation: "community_post_list_view"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "trails_created_by_profiles_profile_id_fk"
+            columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["profile_id"]
           },
@@ -486,6 +577,13 @@ export type Database = {
             foreignKeyName: "viewpoints_created_by_profiles_profile_id_fk"
             columns: ["created_by"]
             isOneToOne: false
+            referencedRelation: "community_post_list_view"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "viewpoints_created_by_profiles_profile_id_fk"
+            columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["profile_id"]
           },
@@ -493,7 +591,45 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      community_post_list_view: {
+        Row: {
+          avatar_url: string | null
+          content: string | null
+          created_at: string | null
+          created_by: string | null
+          post_id: number | null
+          profile_id: string | null
+          title: string | null
+          updated_at: string | null
+          upvote_count: number | null
+          username: string | null
+          viewpoint_id: string | null
+          viewpoint_title: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_created_by_profiles_profile_id_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "community_post_list_view"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "posts_created_by_profiles_profile_id_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "posts_viewpoint_id_viewpoints_id_fk"
+            columns: ["viewpoint_id"]
+            isOneToOne: false
+            referencedRelation: "viewpoints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never
