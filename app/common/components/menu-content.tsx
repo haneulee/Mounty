@@ -52,6 +52,7 @@ export function MenuContent({ menus }: NavigationMenuProps) {
                           <Link
                             className="p-3 space-y-1 block leading-none no-underline outline-none"
                             to={item.to}
+                            prefetch="intent"
                           >
                             <span className="text-sm font-medium leading-none">
                               {item.name}

@@ -1,5 +1,4 @@
 import { ContentLayout } from "~/common/components/layout/content-layout";
-import type { Database } from "~/supa-client";
 import { PostCard } from "../components/post-card";
 import type { Route } from "./+types/community-page";
 import { useGetCommunityPosts } from "../queries";
@@ -30,6 +29,12 @@ export const meta: Route.MetaFunction = () => {
 export const loader = async () => {
   const posts = await useGetCommunityPosts();
   return { posts };
+};
+
+export const clientLoader = async ({
+  serverLoader,
+}: Route.ClientLoaderArgs) => {
+  //track analytics
 };
 
 export default function CommunityPage({ loaderData }: Route.ComponentProps) {
@@ -65,13 +70,9 @@ export default function CommunityPage({ loaderData }: Route.ComponentProps) {
       }}
     >
       <div className="space-y-4">
-        {loaderData.posts.map(
-          (
-            post: Database["public"]["Views"]["community_post_list_view"]["Row"]
-          ) => (
-            <PostCard key={post.post_id} post={post} />
-          )
-        )}
+        {loaderData.posts.map((post) => (
+          <PostCard key={post.post_id} post={post} />
+        ))}
       </div>
     </ContentLayout>
   );
