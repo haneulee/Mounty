@@ -1,19 +1,27 @@
+DROP VIEW IF EXISTS community_post_list_view;
+
 CREATE VIEW community_post_list_view AS
 SELECT
     p.*,
     pr.username,
     pr.profile_id,
+    pr.photos as profile_photos,
     v.title AS viewpoint_title,
-    COUNT(pu.profile_id) AS upvote_count,
-    ph.url AS avatar_url,
+    COUNT(pu.profile_id) AS upvote_count
 FROM posts p
 JOIN profiles pr ON p.created_by = pr.profile_id
 LEFT JOIN viewpoints v ON p.viewpoint_id = v.id
 LEFT JOIN post_upvotes pu ON p.post_id = pu.post_id
-LEFT JOIN photos ph ON pr.profile_id = ph.profile_id AND ph.is_thumbnail = true
 GROUP BY 
     p.post_id,
+    p.title,
+    p.content,
+    p.created_at,
+    p.updated_at,
+    p.viewpoint_id,
+    p.created_by,
+    p.photos,
     pr.username,
     pr.profile_id,
-    v.title,
-    ph.url;
+    pr.photos,
+    v.title;

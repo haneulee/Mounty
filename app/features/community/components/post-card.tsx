@@ -12,24 +12,17 @@ import {
 
 import { Badge } from "~/common/components/ui/badge";
 import { Button } from "~/common/components/ui/button";
+import type { Database } from "~/supa-client";
 import { Link } from "react-router";
 import { ThumbsUp } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
-interface Post {
-  post_id: number | null;
-  title: string | null;
-  content: string | null;
-  created_at: string | null;
-  created_by: string | null;
-  viewpoint_id: string | null;
-  username: string | null;
-  avatar_url: string | null;
-  viewpoint_title: string | null;
-  upvote_count: number | null;
-}
+export type Post =
+  Database["public"]["Views"]["community_post_list_view"]["Row"] & {
+    profile_photos: { url: string; description: string | null }[] | null;
+  };
 
-interface PostCardProps {
+export interface PostCardProps {
   post: Post;
 }
 
@@ -42,7 +35,7 @@ export function PostCard({ post }: PostCardProps) {
     content,
     created_at,
     username,
-    avatar_url,
+    profile_photos,
     viewpoint_title,
     upvote_count,
   } = post;
@@ -53,11 +46,9 @@ export function PostCard({ post }: PostCardProps) {
         <CardHeader className="p-3 sm:p-4 space-y-2">
           <div className="flex items-center gap-3 justify-between">
             <div className="flex items-center gap-2 min-w-0">
-              <Avatar className="size-7 sm:size-8">
-                <AvatarImage src={avatar_url ?? undefined} />
-                <AvatarFallback>
-                  {username?.[0]?.toUpperCase() ?? "U"}
-                </AvatarFallback>
+              <Avatar className="size-8">
+                <AvatarImage src={profile_photos?.[0]?.url || undefined} />
+                <AvatarFallback>{username?.[0]?.toUpperCase()}</AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
                 <span className="text-xs sm:text-sm font-medium truncate block">

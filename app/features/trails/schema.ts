@@ -3,6 +3,7 @@ import {
   check,
   doublePrecision,
   integer,
+  jsonb,
   pgTable,
   text,
   timestamp,
@@ -41,6 +42,9 @@ export const trails = pgTable(
     posts_count: integer("posts_count").notNull().default(0),
     created_at: timestamp("created_at").notNull().defaultNow(),
     updated_at: timestamp("updated_at").notNull().defaultNow(),
+    photos: jsonb("photos").$type<
+      { url: string; description: string | null }[] | null
+    >(),
   },
   (table) => [
     check("rating_check", sql`${table.rating} BETWEEN 1 AND 5`),

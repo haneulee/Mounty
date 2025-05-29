@@ -1,4 +1,5 @@
 import { ContentLayout } from "~/common/components/layout/content-layout";
+import type { Post } from "../components/post-card";
 import { PostCard } from "../components/post-card";
 import type { Route } from "./+types/community-page";
 import { useGetCommunityPosts } from "../queries";
@@ -27,7 +28,7 @@ export const meta: Route.MetaFunction = () => {
 };
 
 export const loader = async () => {
-  const posts = await useGetCommunityPosts();
+  const posts = (await useGetCommunityPosts()) as Post[];
   return { posts };
 };
 

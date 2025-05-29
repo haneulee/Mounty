@@ -22,6 +22,20 @@
       "when": 1748378742340,
       "tag": "0002_wonderful_puff_adder",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1748525902414,
+      "tag": "0003_funny_lenny_balinger",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1748527739888,
+      "tag": "0004_special_hellcat",
+      "breakpoints": true
     }
   ]
 }

@@ -1,6 +1,7 @@
 import {
   bigint,
   integer,
+  jsonb,
   pgTable,
   primaryKey,
   text,
@@ -25,6 +26,9 @@ export const posts = pgTable("posts", {
   created_by: uuid().references(() => profiles.profile_id, {
     onDelete: "cascade",
   }),
+  photos: jsonb("photos").$type<
+    { url: string; description: string | null }[] | null
+  >(),
 });
 
 export const postUpvotes = pgTable(

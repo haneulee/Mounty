@@ -30,6 +30,9 @@ export const profiles = pgTable("profiles", {
   password: text().notNull(),
   created_at: timestamp().notNull().defaultNow(),
   updated_at: timestamp().notNull().defaultNow(),
+  photos: jsonb("photos").$type<
+    { url: string; description: string | null }[] | null
+  >(),
 });
 
 export const follows = pgTable(
