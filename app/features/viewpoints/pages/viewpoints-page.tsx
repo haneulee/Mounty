@@ -4,6 +4,7 @@ import { ViewpointCard } from "~/features/viewpoints/components/viewpoint-card";
 import type { ViewpointCardProps } from "~/features/viewpoints/components/viewpoint-card";
 import { useGetViewpoints } from "../queries";
 import { useSearchParams } from "react-router";
+import { z } from "zod";
 
 interface FilterOption {
   label: string;
@@ -23,27 +24,40 @@ const PERIOD_OPTIONS: FilterOption[] = [
   { label: "This Year", value: "year" },
 ];
 
+const searchParamsSchema = z.object({
+  page: z
+    .string()
+    .transform((val: string) => parseInt(val, 10))
+    .optional(),
+  sorting: z.enum(["newest", "popular", "rating"]).optional(),
+  period: z.enum(["all", "week", "month", "year"]).optional(),
+  search: z.string().optional(),
+});
+
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
-  const page = parseInt(url.searchParams.get("page") || "1", 10);
-  const sortBy = (url.searchParams.get("sorting") || "newest") as
-    | "newest"
-    | "popular"
-    | "rating";
-  const period = (url.searchParams.get("period") || "all") as
-    | "all"
-    | "week"
-    | "month"
-    | "year";
+  const { success, data: parsedData } = searchParamsSchema.safeParse(
+    Object.fromEntries(url.searchParams)
+  );
+
+  if (!success) {
+    throw new Response(
+      JSON.stringify({
+        error_code: "invalid_search_params",
+        message: "Invalid search params",
+      }),
+      { status: 400 }
+    );
+  }
 
   const {
     data: viewpoints,
     totalPages,
     currentPage,
   } = await useGetViewpoints({
-    page,
-    sortBy,
-    period,
+    page: parsedData.page || 1,
+    sortBy: parsedData.sorting || "newest",
+    period: parsedData.period || "all",
   });
 
   return { viewpoints, totalPages, currentPage };
