@@ -44,6 +44,13 @@ export type Database = {
             foreignKeyName: "follows_follower_id_profiles_profile_id_fk"
             columns: ["follower_id"]
             isOneToOne: false
+            referencedRelation: "trails_list_view"
+            referencedColumns: ["created_by_id"]
+          },
+          {
+            foreignKeyName: "follows_follower_id_profiles_profile_id_fk"
+            columns: ["follower_id"]
+            isOneToOne: false
             referencedRelation: "viewpoints_list_view"
             referencedColumns: ["profile_id"]
           },
@@ -60,6 +67,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "follows_following_id_profiles_profile_id_fk"
+            columns: ["following_id"]
+            isOneToOne: false
+            referencedRelation: "trails_list_view"
+            referencedColumns: ["created_by_id"]
           },
           {
             foreignKeyName: "follows_following_id_profiles_profile_id_fk"
@@ -120,6 +134,13 @@ export type Database = {
             foreignKeyName: "notifications_recipient_id_profiles_profile_id_fk"
             columns: ["recipient_id"]
             isOneToOne: false
+            referencedRelation: "trails_list_view"
+            referencedColumns: ["created_by_id"]
+          },
+          {
+            foreignKeyName: "notifications_recipient_id_profiles_profile_id_fk"
+            columns: ["recipient_id"]
+            isOneToOne: false
             referencedRelation: "viewpoints_list_view"
             referencedColumns: ["profile_id"]
           },
@@ -136,6 +157,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "notifications_sender_id_profiles_profile_id_fk"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "trails_list_view"
+            referencedColumns: ["created_by_id"]
           },
           {
             foreignKeyName: "notifications_sender_id_profiles_profile_id_fk"
@@ -217,6 +245,13 @@ export type Database = {
             foreignKeyName: "post_replies_profile_id_profiles_profile_id_fk"
             columns: ["profile_id"]
             isOneToOne: false
+            referencedRelation: "trails_list_view"
+            referencedColumns: ["created_by_id"]
+          },
+          {
+            foreignKeyName: "post_replies_profile_id_profiles_profile_id_fk"
+            columns: ["profile_id"]
+            isOneToOne: false
             referencedRelation: "viewpoints_list_view"
             referencedColumns: ["profile_id"]
           },
@@ -256,6 +291,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "post_reply_upvotes_profile_id_profiles_profile_id_fk"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "trails_list_view"
+            referencedColumns: ["created_by_id"]
           },
           {
             foreignKeyName: "post_reply_upvotes_profile_id_profiles_profile_id_fk"
@@ -307,6 +349,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "post_upvotes_profile_id_profiles_profile_id_fk"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "trails_list_view"
+            referencedColumns: ["created_by_id"]
           },
           {
             foreignKeyName: "post_upvotes_profile_id_profiles_profile_id_fk"
@@ -370,8 +419,22 @@ export type Database = {
             foreignKeyName: "posts_created_by_profiles_profile_id_fk"
             columns: ["created_by"]
             isOneToOne: false
+            referencedRelation: "trails_list_view"
+            referencedColumns: ["created_by_id"]
+          },
+          {
+            foreignKeyName: "posts_created_by_profiles_profile_id_fk"
+            columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "viewpoints_list_view"
             referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "posts_viewpoint_id_viewpoints_id_fk"
+            columns: ["viewpoint_id"]
+            isOneToOne: false
+            referencedRelation: "trails_list_view"
+            referencedColumns: ["viewpoint_id"]
           },
           {
             foreignKeyName: "posts_viewpoint_id_viewpoints_id_fk"
@@ -450,6 +513,7 @@ export type Database = {
           elevation_gain: number
           end_location: string
           estimated_time: number
+          gpx: string | null
           id: string
           photos: Json | null
           posts_count: number
@@ -470,6 +534,7 @@ export type Database = {
           elevation_gain: number
           end_location: string
           estimated_time: number
+          gpx?: string | null
           id: string
           photos?: Json | null
           posts_count?: number
@@ -490,6 +555,7 @@ export type Database = {
           elevation_gain?: number
           end_location?: string
           estimated_time?: number
+          gpx?: string | null
           id?: string
           photos?: Json | null
           posts_count?: number
@@ -520,8 +586,22 @@ export type Database = {
             foreignKeyName: "trails_created_by_profiles_profile_id_fk"
             columns: ["created_by"]
             isOneToOne: false
+            referencedRelation: "trails_list_view"
+            referencedColumns: ["created_by_id"]
+          },
+          {
+            foreignKeyName: "trails_created_by_profiles_profile_id_fk"
+            columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "viewpoints_list_view"
             referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "trails_viewpoint_id_viewpoints_id_fk"
+            columns: ["viewpoint_id"]
+            isOneToOne: false
+            referencedRelation: "trails_list_view"
+            referencedColumns: ["viewpoint_id"]
           },
           {
             foreignKeyName: "trails_viewpoint_id_viewpoints_id_fk"
@@ -601,6 +681,13 @@ export type Database = {
             foreignKeyName: "viewpoints_created_by_profiles_profile_id_fk"
             columns: ["created_by"]
             isOneToOne: false
+            referencedRelation: "trails_list_view"
+            referencedColumns: ["created_by_id"]
+          },
+          {
+            foreignKeyName: "viewpoints_created_by_profiles_profile_id_fk"
+            columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "viewpoints_list_view"
             referencedColumns: ["profile_id"]
           },
@@ -644,8 +731,22 @@ export type Database = {
             foreignKeyName: "posts_created_by_profiles_profile_id_fk"
             columns: ["created_by"]
             isOneToOne: false
+            referencedRelation: "trails_list_view"
+            referencedColumns: ["created_by_id"]
+          },
+          {
+            foreignKeyName: "posts_created_by_profiles_profile_id_fk"
+            columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "viewpoints_list_view"
             referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "posts_viewpoint_id_viewpoints_id_fk"
+            columns: ["viewpoint_id"]
+            isOneToOne: false
+            referencedRelation: "trails_list_view"
+            referencedColumns: ["viewpoint_id"]
           },
           {
             foreignKeyName: "posts_viewpoint_id_viewpoints_id_fk"
@@ -662,6 +763,35 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      trails_list_view: {
+        Row: {
+          created_at: string | null
+          created_by_id: string | null
+          created_by_photos: Json | null
+          created_by_username: string | null
+          description: string | null
+          difficulty: string | null
+          distance: number | null
+          elevation_gain: number | null
+          end_location: string | null
+          estimated_time: number | null
+          gpx: string | null
+          id: string | null
+          photos: Json | null
+          posts_count: number | null
+          rating: number | null
+          rating_count: number | null
+          season: string | null
+          start_location: string | null
+          thumbnail_photo_url: string | null
+          title: string | null
+          updated_at: string | null
+          viewpoint_id: string | null
+          viewpoint_location_name: string | null
+          viewpoint_title: string | null
+        }
+        Relationships: []
       }
       viewpoints_list_view: {
         Row: {
@@ -695,6 +825,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "viewpoints_created_by_profiles_profile_id_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "trails_list_view"
+            referencedColumns: ["created_by_id"]
           },
           {
             foreignKeyName: "viewpoints_created_by_profiles_profile_id_fk"

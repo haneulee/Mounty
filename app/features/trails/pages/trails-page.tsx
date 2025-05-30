@@ -1,7 +1,11 @@
+import { DIFFICULTY_VALUES, SEASON_VALUES } from "../constants";
+
 import { ContentLayout } from "~/common/components/layout/content-layout";
 import type { Route } from "~/types";
 import { TrailCard } from "~/features/trails/components/trail-card";
+import { useGetTrails } from "../queries";
 import { useSearchParams } from "react-router";
+import { z } from "zod";
 
 interface FilterOption {
   label: string;
@@ -21,107 +25,61 @@ const PERIOD_OPTIONS: FilterOption[] = [
   { label: "This Year", value: "year" },
 ];
 
-interface Trail {
-  id: string;
-  title: string;
-  description: string;
-  startLocation: string;
-  endLocation: string;
-  distance: number;
-  elevationGain: number;
-  estimatedTime: number;
-  difficulty: string;
-  season: string;
-  thumbnailPhotoUrl: string;
-  createdAt: Date;
-  createdBy: {
-    id: string;
-    username: string;
-    profileImageUrl?: string;
-  };
-}
+const DIFFICULTY_OPTIONS: FilterOption[] = DIFFICULTY_VALUES.map((value) => ({
+  label: value.charAt(0).toUpperCase() + value.slice(1),
+  value,
+}));
 
-export function loader({ request }: Route.LoaderArgs) {
-  return {
-    trails: [
-      {
-        id: "1",
-        title: "Everest Base Camp Trek",
-        description: "The classic trek to Everest Base Camp",
-        startLocation: "Lukla",
-        endLocation: "Everest Base Camp",
-        distance: 130,
-        elevationGain: 2800,
-        estimatedTime: 12,
-        difficulty: "hard",
-        season: "spring",
-        thumbnailPhotoUrl: "https://github.com/haneulee.png",
-        createdAt: new Date(),
-        createdBy: {
-          id: "1",
-          username: "john_doe",
-          profileImageUrl: "https://github.com/haneulee.png",
-        },
-      },
-      {
-        id: "2",
-        title: "Annapurna Circuit",
-        description: "One of the most diverse treks in Nepal",
-        startLocation: "Besisahar",
-        endLocation: "Jomsom",
-        distance: 160,
-        elevationGain: 3000,
-        estimatedTime: 14,
-        difficulty: "hard",
-        season: "fall",
-        thumbnailPhotoUrl: "https://github.com/haneulee.png",
-        createdAt: new Date(),
-        createdBy: {
-          id: "2",
-          username: "mountain_lover",
-          profileImageUrl: "https://github.com/haneulee.png",
-        },
-      },
-      {
-        id: "3",
-        title: "Inca Trail to Machu Picchu",
-        description: "Ancient path to the lost city of the Incas",
-        startLocation: "Cusco",
-        endLocation: "Machu Picchu",
-        distance: 43,
-        elevationGain: 1200,
-        estimatedTime: 4,
-        difficulty: "moderate",
-        season: "winter",
-        thumbnailPhotoUrl: "https://github.com/haneulee.png",
-        createdAt: new Date(),
-        createdBy: {
-          id: "3",
-          username: "nature_explorer",
-          profileImageUrl: "https://github.com/haneulee.png",
-        },
-      },
-      {
-        id: "4",
-        title: "Tour du Mont Blanc",
-        description: "Circumnavigate Western Europe's highest mountain",
-        startLocation: "Chamonix",
-        endLocation: "Chamonix",
-        distance: 170,
-        elevationGain: 10000,
-        estimatedTime: 11,
-        difficulty: "hard",
-        season: "summer",
-        thumbnailPhotoUrl: "https://github.com/haneulee.png",
-        createdAt: new Date(),
-        createdBy: {
-          id: "4",
-          username: "travel_enthusiast",
-          profileImageUrl: "https://github.com/haneulee.png",
-        },
-      },
-    ] as Trail[],
-  };
+const SEASON_OPTIONS: FilterOption[] = [
+  { label: "Spring", value: "spring" },
+  { label: "Summer", value: "summer" },
+  { label: "Fall", value: "fall" },
+  { label: "Winter", value: "winter" },
+  { label: "All Seasons", value: "all" },
+];
+
+const searchParamsSchema = z.object({
+  page: z
+    .string()
+    .transform((val: string) => parseInt(val, 10))
+    .optional(),
+  sorting: z.enum(["newest", "popular", "rating"]).optional(),
+  period: z.enum(["all", "week", "month", "year"]).optional(),
+  search: z.string().optional(),
+  difficulty: z.enum(DIFFICULTY_VALUES).optional(),
+  season: z.enum(SEASON_VALUES).optional(),
+});
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const url = new URL(request.url);
+  const { success, data: parsedData } = searchParamsSchema.safeParse(
+    Object.fromEntries(url.searchParams)
+  );
+
+  if (!success) {
+    throw new Response(
+      JSON.stringify({
+        error_code: "invalid_search_params",
+        message: "Invalid search params",
+      }),
+      { status: 400 }
+    );
+  }
+
+  const {
+    data: trails,
+    totalPages,
+    currentPage,
+  } = await useGetTrails({
+    page: parsedData.page || 1,
+    sortBy: parsedData.sorting || "newest",
+    period: parsedData.period || "all",
+    search: parsedData.search,
+    difficulty: parsedData.difficulty,
+    season: parsedData.season,
+  });
+
+  return { trails, totalPages, currentPage };
 }
 
 export function action({ request }: Route.ActionArgs) {
@@ -133,7 +91,7 @@ export const meta: Route.MetaFunction = () => {
     { title: "Trails - Mounty" },
     {
       name: "description",
-      content: "Discover hiking trails around the world",
+      content: "Discover beautiful trails around the world",
     },
   ];
 };
@@ -143,68 +101,73 @@ export default function TrailsPage({ loaderData }: Route.ComponentProps) {
   const sorting = searchParams.get("sorting") || "newest";
   const period = searchParams.get("period") || "all";
   const search = searchParams.get("search") || "";
+  const difficulty = searchParams.get("difficulty") || "";
+  const season = searchParams.get("season") || "";
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
-  const sidebarFilters = [
-    {
-      title: "Difficulty",
-      type: "link" as const,
-      options: [
-        { label: "Easy", value: "easy" },
-        { label: "Moderate", value: "moderate" },
-        { label: "Hard", value: "hard" },
-      ],
-    },
-    {
-      title: "Season",
-      type: "link" as const,
-      options: [
-        { label: "Spring", value: "spring" },
-        { label: "Summer", value: "summer" },
-        { label: "Fall", value: "fall" },
-        { label: "Winter", value: "winter" },
-      ],
-    },
-    {
-      title: "Popular Tags",
-      type: "tag" as const,
-      options: [
-        { label: "Hiking", value: "hiking" },
-        { label: "Camping", value: "camping" },
-        { label: "Nature", value: "nature" },
-        { label: "Adventure", value: "adventure" },
-        { label: "Scenic", value: "scenic" },
-      ],
-    },
-  ];
+  const handleFilterChange = (type: "difficulty" | "season", value: string) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (value === searchParams.get(type)) {
+      newParams.delete(type);
+    } else {
+      newParams.set(type, value);
+    }
+    newParams.set("page", "1");
+    setSearchParams(newParams);
+  };
 
   return (
     <ContentLayout
       title="Trails"
-      subtitle="Discover hiking trails around the world"
+      subtitle="Discover beautiful trails around the world"
       searchPlaceholder="Search trails..."
       addButtonText="Add Trail"
       addButtonLink="/trails/new"
       sortOptions={SORT_OPTIONS}
       periodOptions={PERIOD_OPTIONS}
-      sidebarFilters={sidebarFilters}
+      sidebarFilters={[
+        {
+          title: "Difficulty",
+          options: DIFFICULTY_OPTIONS,
+          type: "link",
+          value: difficulty,
+          onChange: (value) => handleFilterChange("difficulty", value),
+        },
+        {
+          title: "Season",
+          options: SEASON_OPTIONS,
+          type: "link",
+          value: season,
+          onChange: (value) => handleFilterChange("season", value),
+        },
+      ]}
       currentSort={sorting}
       currentPeriod={period}
       searchValue={search}
       onSearch={(value) => {
         searchParams.set("search", value);
+        searchParams.set("page", "1");
         setSearchParams(searchParams);
       }}
       onSort={(value) => {
         searchParams.set("sorting", value);
+        searchParams.set("page", "1");
         setSearchParams(searchParams);
       }}
       onPeriodChange={(value) => {
         searchParams.set("period", value);
+        searchParams.set("page", "1");
         setSearchParams(searchParams);
       }}
+      onPageChange={(page) => {
+        searchParams.set("page", page.toString());
+        setSearchParams(searchParams);
+      }}
+      currentPage={currentPage}
+      totalPages={loaderData.totalPages}
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-        {loaderData.trails.map((trail: Trail) => (
+        {loaderData.trails.map((trail: any) => (
           <TrailCard key={trail.id} {...trail} />
         ))}
       </div>

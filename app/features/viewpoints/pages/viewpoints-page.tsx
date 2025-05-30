@@ -58,6 +58,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     page: parsedData.page || 1,
     sortBy: parsedData.sorting || "newest",
     period: parsedData.period || "all",
+    search: parsedData.search,
   });
 
   return { viewpoints, totalPages, currentPage };

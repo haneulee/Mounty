@@ -1,9 +1,9 @@
 import { ContentLayout } from "~/common/components/layout/content-layout";
-import type { Post } from "../components/post-card";
-import { PostCard } from "../components/post-card";
-import type { Route } from "./+types/community-page";
-import { useGetCommunityPosts } from "../queries";
+import { PostCard } from "~/features/community/components/post-card";
+import type { Route } from "~/types";
+import { useGetPosts } from "../queries";
 import { useSearchParams } from "react-router";
+import { z } from "zod";
 
 interface FilterOption {
   label: string;
@@ -11,9 +11,8 @@ interface FilterOption {
 }
 
 const SORT_OPTIONS: FilterOption[] = [
-  { label: "Latest", value: "newest" },
+  { label: "Newest", value: "newest" },
   { label: "Popular", value: "popular" },
-  { label: "Most Comments", value: "comments" },
 ];
 
 const PERIOD_OPTIONS: FilterOption[] = [
@@ -23,19 +22,58 @@ const PERIOD_OPTIONS: FilterOption[] = [
   { label: "This Year", value: "year" },
 ];
 
+const searchParamsSchema = z.object({
+  page: z
+    .string()
+    .transform((val: string) => parseInt(val, 10))
+    .optional(),
+  sorting: z.enum(["newest", "popular"]).optional(),
+  period: z.enum(["all", "week", "month", "year"]).optional(),
+  search: z.string().optional(),
+});
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const url = new URL(request.url);
+  const { success, data: parsedData } = searchParamsSchema.safeParse(
+    Object.fromEntries(url.searchParams)
+  );
+
+  if (!success) {
+    throw new Response(
+      JSON.stringify({
+        error_code: "invalid_search_params",
+        message: "Invalid search params",
+      }),
+      { status: 400 }
+    );
+  }
+
+  const {
+    data: posts,
+    totalPages,
+    currentPage,
+  } = await useGetPosts({
+    page: parsedData.page || 1,
+    sortBy: parsedData.sorting || "newest",
+    period: parsedData.period || "all",
+    search: parsedData.search,
+  });
+
+  return { posts, totalPages, currentPage };
+}
+
+export function action({ request }: Route.ActionArgs) {
+  return {};
+}
+
 export const meta: Route.MetaFunction = () => {
-  return [{ title: "Community | Mounty" }];
-};
-
-export const loader = async () => {
-  const posts = (await useGetCommunityPosts()) as Post[];
-  return { posts };
-};
-
-export const clientLoader = async ({
-  serverLoader,
-}: Route.ClientLoaderArgs) => {
-  //track analytics
+  return [
+    { title: "Community - Mounty" },
+    {
+      name: "description",
+      content: "Join our community of outdoor enthusiasts",
+    },
+  ];
 };
 
 export default function CommunityPage({ loaderData }: Route.ComponentProps) {
@@ -43,11 +81,12 @@ export default function CommunityPage({ loaderData }: Route.ComponentProps) {
   const sorting = searchParams.get("sorting") || "newest";
   const period = searchParams.get("period") || "all";
   const search = searchParams.get("search") || "";
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
   return (
     <ContentLayout
       title="Community"
-      subtitle="Share your hiking experiences and stories"
+      subtitle="Join our community of outdoor enthusiasts"
       searchPlaceholder="Search posts..."
       addButtonText="Write Post"
       addButtonLink="/posts/new"
@@ -59,19 +98,28 @@ export default function CommunityPage({ loaderData }: Route.ComponentProps) {
       searchValue={search}
       onSearch={(value) => {
         searchParams.set("search", value);
+        searchParams.set("page", "1");
         setSearchParams(searchParams);
       }}
       onSort={(value) => {
         searchParams.set("sorting", value);
+        searchParams.set("page", "1");
         setSearchParams(searchParams);
       }}
       onPeriodChange={(value) => {
         searchParams.set("period", value);
+        searchParams.set("page", "1");
         setSearchParams(searchParams);
       }}
+      onPageChange={(page) => {
+        searchParams.set("page", page.toString());
+        setSearchParams(searchParams);
+      }}
+      currentPage={currentPage}
+      totalPages={loaderData.totalPages}
     >
-      <div className="space-y-4">
-        {loaderData.posts.map((post) => (
+      <div className="grid grid-cols-1 gap-4">
+        {loaderData.posts.map((post: any) => (
           <PostCard key={post.post_id} post={post} />
         ))}
       </div>

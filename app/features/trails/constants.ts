@@ -7,8 +7,8 @@ export const DIFFICULTY = {
 
 export const SEASON = {
   SPRING: "spring",
+  FALL: "fall",
   SUMMER: "summer",
-  AUTUMN: "autumn",
   WINTER: "winter",
   ALL: "all",
 } as const;
@@ -22,7 +22,7 @@ export const DIFFICULTY_VALUES = [
 export const SEASON_VALUES = [
   "spring",
   "summer",
-  "autumn",
+  "fall",
   "winter",
   "all",
 ] as const;

@@ -16,8 +16,18 @@ export type Database = MergeDeep<
             SetNonNullable<
               SupabaseDatabase["public"]["Views"]["community_post_list_view"]["Row"]
             >,
-            "profile_photos" | "username" | "viewpoint_title",
+            "profile_photos" | "username",
             string | null
+          >;
+        };
+        viewpoint_list_view: {
+          Row: SetNonNullable<
+            SupabaseDatabase["public"]["Views"]["viewpoints_list_view"]["Row"]
+          >;
+        };
+        trails_list_view: {
+          Row: SetNonNullable<
+            SupabaseDatabase["public"]["Views"]["trails_list_view"]["Row"]
           >;
         };
       };

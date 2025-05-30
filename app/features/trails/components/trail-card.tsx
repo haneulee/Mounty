@@ -20,43 +20,43 @@ interface TrailCardProps {
   id: string;
   title: string;
   description: string;
-  startLocation: string;
-  endLocation: string;
+  start_location: string;
+  end_location: string;
   distance: number;
-  elevationGain: number;
-  estimatedTime: number;
+  elevation_gain: number;
+  estimated_time: number;
   difficulty: string;
   season: string;
-  thumbnailPhotoUrl: string;
-  createdAt: Date;
-  createdBy: {
-    id: string;
-    username: string;
-    profileImageUrl?: string;
-  };
+  thumbnail_photo_url: string;
+  created_at: Date;
+  created_by_id: string;
+  created_by_username: string;
+  created_by_photos?: string;
 }
 
 export function TrailCard({
   id,
   title,
   description,
-  startLocation,
-  endLocation,
+  start_location,
+  end_location,
   distance,
-  elevationGain,
-  estimatedTime,
+  elevation_gain,
+  estimated_time,
   difficulty,
   season,
-  thumbnailPhotoUrl,
-  createdAt,
-  createdBy,
+  thumbnail_photo_url,
+  created_at,
+  created_by_id,
+  created_by_username,
+  created_by_photos,
 }: TrailCardProps) {
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow relative aspect-[3/4]">
       <Link to={`/trails/${id}`} className="block h-full">
         <div className="absolute inset-0">
           <img
-            src={thumbnailPhotoUrl}
+            src={thumbnail_photo_url}
             alt={title}
             className="w-full h-full object-cover"
           />
@@ -73,7 +73,7 @@ export function TrailCard({
             <div className="flex items-center gap-2 text-sm text-white/80">
               <MapPinIcon className="size-4" />
               <span className="line-clamp-1">
-                {startLocation} → {endLocation}
+                {start_location} → {end_location}
               </span>
             </div>
             <div className="flex items-center gap-3 text-sm text-white/80">
@@ -83,7 +83,7 @@ export function TrailCard({
               </div>
               <div className="flex items-center gap-1">
                 <ClockIcon className="size-4" />
-                <span>{estimatedTime}일</span>
+                <span>{estimated_time}일</span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="capitalize">{season}</span>
@@ -92,19 +92,21 @@ export function TrailCard({
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
                 <Avatar className="size-6 border-2 border-white">
-                  <AvatarImage src={createdBy.profileImageUrl} />
+                  <AvatarImage src={created_by_photos} />
                   <AvatarFallback className="bg-white/20 text-white">
-                    {createdBy.username[0].toUpperCase()}
+                    {created_by_username[0].toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <span className="text-sm text-white/80 line-clamp-1">
-                  {createdBy.username}
+                  {created_by_username}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm text-white/80">
                 <ClockIcon className="size-4" />
                 <span>
-                  {formatDistanceToNow(createdAt, { addSuffix: true })}
+                  {formatDistanceToNow(created_at, {
+                    addSuffix: true,
+                  })}
                 </span>
               </div>
             </div>

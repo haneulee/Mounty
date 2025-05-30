@@ -23,6 +23,8 @@ interface SidebarFilter {
   title: string;
   options: FilterOption[];
   type: "link" | "tag";
+  value: string;
+  onChange: (value: string) => void;
 }
 
 interface ContentLayoutProps {

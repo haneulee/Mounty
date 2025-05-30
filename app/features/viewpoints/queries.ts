@@ -5,6 +5,7 @@ interface GetViewpointsOptions {
   pageSize?: number;
   sortBy?: "newest" | "popular" | "rating";
   period?: "all" | "week" | "month" | "year";
+  search?: string;
 }
 
 export async function useGetViewpoints({
@@ -12,6 +13,7 @@ export async function useGetViewpoints({
   pageSize = 12,
   sortBy = "newest",
   period = "all",
+  search,
 }: GetViewpointsOptions = {}) {
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
@@ -19,6 +21,13 @@ export async function useGetViewpoints({
   let query = supabase
     .from("viewpoints_list_view")
     .select("*", { count: "exact" });
+
+  // 검색어가 있는 경우 검색 조건 추가
+  if (search) {
+    query = query.or(
+      `title.ilike.%${search}%,description.ilike.%${search}%,location_name.ilike.%${search}%`
+    );
+  }
 
   // 기간 필터 적용
   if (period !== "all") {

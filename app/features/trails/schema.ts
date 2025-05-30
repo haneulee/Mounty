@@ -45,6 +45,7 @@ export const trails = pgTable(
     photos: jsonb("photos").$type<
       { url: string; description: string | null }[] | null
     >(),
+    gpx: text("gpx"),
   },
   (table) => [
     check("rating_check", sql`${table.rating} BETWEEN 1 AND 5`),
