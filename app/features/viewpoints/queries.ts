@@ -22,18 +22,13 @@ export async function useGetViewpoints({
     .from("viewpoints_list_view")
     .select("*", { count: "exact" });
 
-  // 검색어가 있는 경우 검색 조건 추가
   if (search) {
-    query = query.or(
-      `title.ilike.%${search}%,description.ilike.%${search}%,location_name.ilike.%${search}%`
-    );
+    query = query.ilike("title", `%${search}%`);
   }
 
-  // 기간 필터 적용
   if (period !== "all") {
     const now = new Date();
-    let startDate = new Date();
-
+    const startDate = new Date();
     switch (period) {
       case "week":
         startDate.setDate(now.getDate() - 7);
@@ -45,21 +40,18 @@ export async function useGetViewpoints({
         startDate.setFullYear(now.getFullYear() - 1);
         break;
     }
-
     query = query.gte("created_at", startDate.toISOString());
   }
 
-  // 정렬 적용
   switch (sortBy) {
-    case "newest":
-      query = query.order("created_at", { ascending: false });
-      break;
     case "popular":
-      query = query.order("rating_count", { ascending: false });
+      query = query.order("posts_count", { ascending: false });
       break;
     case "rating":
       query = query.order("rating", { ascending: false });
       break;
+    default:
+      query = query.order("created_at", { ascending: false });
   }
 
   const { data, error, count } = await query.range(from, to);
@@ -73,5 +65,76 @@ export async function useGetViewpoints({
     totalCount: count || 0,
     totalPages: count ? Math.ceil(count / pageSize) : 0,
     currentPage: page,
+  };
+}
+
+interface GetViewpointDetailOptions {
+  viewpointId: string;
+}
+
+export async function useGetViewpointDetail({
+  viewpointId,
+}: GetViewpointDetailOptions) {
+  const { data: viewpoint, error: viewpointError } = await supabase
+    .from("viewpoints_list_view")
+    .select("*")
+    .eq("id", viewpointId)
+    .single();
+
+  if (viewpointError) {
+    throw new Error(viewpointError.message);
+  }
+
+  // Get posts
+  const { data: posts, error: postsError } = await supabase
+    .from("community_post_list_view")
+    .select(
+      `
+      *,
+      username,
+      profile_photos
+    `
+    )
+    .eq("viewpoint_id", viewpointId)
+    .order("created_at", { ascending: false });
+
+  if (postsError) {
+    throw new Error(postsError.message);
+  }
+
+  // Get related trails
+  const { data: trails, error: trailsError } = await supabase
+    .from("trails_list_view")
+    .select("*")
+    .eq("viewpoint_id", viewpointId)
+    .order("rating", { ascending: false });
+
+  if (trailsError) {
+    throw new Error(trailsError.message);
+  }
+
+  // Get author profile
+  const { data: author, error: authorError } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("profile_id", viewpoint.profile_id)
+    .single();
+
+  if (authorError) {
+    throw new Error(authorError.message);
+  }
+
+  return {
+    ...viewpoint,
+    posts: posts || [],
+    relatedTrails: trails || [],
+    createdBy: {
+      id: author.profile_id,
+      username: author.username,
+      profileImageUrl: author.photos?.[0]?.url,
+      bio: author.bio,
+      followersCount: author.followers_count,
+      followingCount: author.following_count,
+    },
   };
 }

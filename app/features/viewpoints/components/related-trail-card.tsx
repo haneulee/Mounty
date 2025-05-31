@@ -4,36 +4,23 @@ import { Button } from "~/common/components/ui/button";
 import { Link } from "react-router";
 import { StarIcon } from "lucide-react";
 
-interface RelatedTrailCardProps {
-  id: string;
-  title: string;
-  description: string;
-  distance: number;
-  elevationGain: number;
-  estimatedTime: number;
-  difficulty: "easy" | "moderate" | "hard" | "expert";
-  thumbnailPhotoUrl: string;
-  rating: number;
-  ratingCount: number;
-}
-
 export function RelatedTrailCard({
   id,
   title,
   description,
   distance,
-  elevationGain,
-  estimatedTime,
+  elevation_gain,
+  estimated_time,
   difficulty,
-  thumbnailPhotoUrl,
+  photos,
   rating,
-  ratingCount,
-}: RelatedTrailCardProps) {
+  rating_count,
+}: any) {
   return (
     <Card className="overflow-hidden">
       <div className="aspect-video relative">
         <img
-          src={thumbnailPhotoUrl}
+          src={photos?.[0] || ""}
           alt={title}
           className="w-full h-full object-cover"
         />
@@ -43,9 +30,9 @@ export function RelatedTrailCard({
           <div className="flex items-center gap-2 text-white/80 text-sm">
             <span>{distance} km</span>
             <span>·</span>
-            <span>{elevationGain} m</span>
+            <span>{elevation_gain} m</span>
             <span>·</span>
-            <span>{estimatedTime} days</span>
+            <span>{estimated_time} days</span>
           </div>
         </div>
       </div>
@@ -55,7 +42,7 @@ export function RelatedTrailCard({
             <StarIcon className="size-4 text-yellow-500" />
             <span className="font-medium">{rating.toFixed(1)}</span>
             <span className="text-muted-foreground text-sm">
-              ({ratingCount})
+              ({rating_count})
             </span>
           </div>
           <span className="text-sm font-medium px-2 py-1 rounded-full bg-muted">

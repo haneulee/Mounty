@@ -31,7 +31,7 @@ export default [
   // Posts routes
   ...prefix("posts", [
     index("features/community/pages/community-page.tsx"),
-    route("/:postId", "features/community/pages/post-page.tsx"),
+    route("/:postId", "features/community/pages/community-detail-page.tsx"),
     route("/new", "features/community/pages/submit-post-page.tsx"),
   ]),
 

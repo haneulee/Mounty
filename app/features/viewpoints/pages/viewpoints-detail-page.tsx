@@ -17,164 +17,26 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/common/components/ui/dialog";
-import { MapPinIcon, StarIcon } from "lucide-react";
 
 import { Button } from "~/common/components/ui/button";
 import { Link } from "react-router";
 import { RelatedTrailCard } from "../components/related-trail-card";
 import type { Route } from "./+types/viewpoints-detail-page";
 import { Star } from "lucide-react";
-import { ViewpointAuthorCard } from "../components/viewpoint-author-card";
 import { ViewpointPosts } from "../components/viewpoint-posts";
+import { formatDistanceToNow } from "date-fns";
+import { ko } from "date-fns/locale";
+import { useGetViewpointDetail } from "../queries";
 import { useState } from "react";
 
-interface Viewpoint {
-  id: string;
-  title: string;
-  description: string;
-  locationName: string;
-  latitude: number;
-  longitude: number;
-  photos: {
-    id: string;
-    url: string;
-    description?: string;
-  }[];
-  createdAt: Date;
-  createdBy: {
-    id: string;
-    username: string;
-    profileImageUrl?: string;
-    bio?: string;
-    followersCount: number;
-    followingCount: number;
-  };
-  rating: number;
-  ratingCount: number;
-  postsCount: number;
-  posts: {
-    id: string;
-    title: string;
-    body: string;
-    visitedDate: Date;
-    weatherDescription: string;
-    createdAt: Date;
-    createdBy: {
-      id: string;
-      username: string;
-      profileImageUrl?: string;
-    };
-  }[];
-  relatedTrails: {
-    id: string;
-    title: string;
-    description: string;
-    distance: number;
-    elevationGain: number;
-    estimatedTime: number;
-    difficulty: string;
-    thumbnailPhotoUrl: string;
-    rating: number;
-    ratingCount: number;
-  }[];
-}
+const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 
-export function loader({ request, params }: Route.LoaderArgs) {
-  // TODO: 실제 데이터베이스에서 뷰포인트 데이터를 가져오도록 수정
-  return {
-    viewpoint: {
-      id: params.viewpointId,
-      title: "Mount Everest Base Camp",
-      description:
-        "The Everest Base Camp is one of the most iconic viewpoints in the world. Located at an altitude of 5,364 meters, it offers breathtaking views of the world's highest mountain. The journey to reach this point is challenging but absolutely worth it for the spectacular scenery and the sense of achievement.",
-      locationName: "Nepal",
-      latitude: 27.9881,
-      longitude: 86.925,
-      photos: [
-        {
-          id: "1",
-          url: "https://github.com/haneulee.png",
-          description: "View of Mount Everest from Base Camp",
-        },
-        {
-          id: "2",
-          url: "https://github.com/haneulee.png",
-          description: "Khumbu Icefall",
-        },
-        {
-          id: "3",
-          url: "https://github.com/haneulee.png",
-          description: "Base Camp at sunset",
-        },
-      ],
-      createdAt: new Date(),
-      createdBy: {
-        id: "1",
-        username: "john_doe",
-        profileImageUrl: "https://github.com/haneulee.png",
-        bio: "Adventure seeker and nature lover. Always looking for the next great view.",
-        followersCount: 1234,
-        followingCount: 567,
-      },
-      rating: 4.8,
-      ratingCount: 1234,
-      postsCount: 567,
-      posts: [
-        {
-          id: "1",
-          title: "My Journey to Everest Base Camp",
-          body: "It was an amazing experience...",
-          visitedDate: new Date(),
-          weatherDescription: "Sunny",
-          createdAt: new Date(),
-          createdBy: {
-            id: "1",
-            username: "john_doe",
-            profileImageUrl: "https://github.com/haneulee.png",
-          },
-        },
-        {
-          id: "2",
-          title: "Breathtaking Views at Base Camp",
-          body: "The sunrise was spectacular...",
-          visitedDate: new Date(),
-          weatherDescription: "Clear",
-          createdAt: new Date(),
-          createdBy: {
-            id: "2",
-            username: "mountain_lover",
-            profileImageUrl: "https://github.com/haneulee.png",
-          },
-        },
-      ],
-      relatedTrails: [
-        {
-          id: "1",
-          title: "Everest Base Camp Trek",
-          description: "The classic trek to Everest Base Camp...",
-          distance: 130,
-          elevationGain: 2800,
-          estimatedTime: 12,
-          difficulty: "hard",
-          thumbnailPhotoUrl: "https://github.com/haneulee.png",
-          rating: 4.9,
-          ratingCount: 2345,
-        },
-        {
-          id: "2",
-          title: "Gokyo Lakes Trek",
-          description: "A beautiful alternative route...",
-          distance: 110,
-          elevationGain: 2500,
-          estimatedTime: 10,
-          difficulty: "hard",
-          thumbnailPhotoUrl: "https://github.com/haneulee.png",
-          rating: 4.7,
-          ratingCount: 1234,
-        },
-      ],
-    } as Viewpoint,
-  };
+export async function loader({ request, params }: Route.LoaderArgs) {
+  const viewpoint = await useGetViewpointDetail({
+    viewpointId: params.viewpointId,
+  });
+
+  return { viewpoint };
 }
 
 export function action({ request }: Route.ActionArgs) {
@@ -190,7 +52,7 @@ export default function ViewpointDetailPage({
 }: Route.ComponentProps) {
   const { viewpoint } = loaderData;
   const [selectedPhoto, setSelectedPhoto] = useState<
-    Viewpoint["photos"][0] | null
+    (typeof viewpoint.photos)[0] | null
   >(null);
 
   return (
@@ -224,24 +86,22 @@ export default function ViewpointDetailPage({
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
                 {viewpoint.title}
               </h1>
-              <p className="text-muted-foreground text-lg">
+              <p className="text-sm text-muted-foreground">
+                {formatDistanceToNow(new Date(viewpoint.created_at), {
+                  addSuffix: true,
+                  locale: ko,
+                })}
+              </p>
+              <p className="text-muted-foreground text-lg mt-4">
                 {viewpoint.description}
               </p>
             </div>
 
             {/* 이미지 갤러리 */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {viewpoint.photos.map((photo) => (
-                <div
-                  key={photo.id}
-                  className="aspect-video bg-muted rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
-                  onClick={() => setSelectedPhoto(photo)}
-                >
-                  <img
-                    src={photo.url}
-                    alt={photo.description}
-                    className="w-full h-full object-cover"
-                  />
+              {viewpoint.photos?.map((photo) => (
+                <div key={photo.id}>
+                  <img src={photo.url} alt={photo.description || ""} />
                 </div>
               ))}
             </div>
@@ -253,7 +113,7 @@ export default function ViewpointDetailPage({
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    {viewpoint.locationName}
+                    {viewpoint.location_name}
                   </p>
                 </CardContent>
               </Card>
@@ -278,7 +138,7 @@ export default function ViewpointDetailPage({
                     <Star className="h-5 w-5 text-yellow-400" />
                     <span className="font-semibold">{viewpoint.rating}</span>
                     <span className="text-muted-foreground">
-                      ({viewpoint.ratingCount} reviews)
+                      ({viewpoint.rating_count} reviews)
                     </span>
                   </div>
                 </CardContent>
@@ -290,7 +150,7 @@ export default function ViewpointDetailPage({
               <h2 className="text-2xl font-semibold mb-4">Location</h2>
               <div className="aspect-video bg-muted rounded-lg overflow-hidden">
                 <iframe
-                  src={`https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${viewpoint.latitude},${viewpoint.longitude}`}
+                  src={`https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_API_KEY}&q=${viewpoint.latitude},${viewpoint.longitude}&zoom=15`}
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
@@ -298,6 +158,17 @@ export default function ViewpointDetailPage({
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                 />
+              </div>
+              <div className="mt-4 flex justify-end">
+                <Button variant="outline" asChild>
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${viewpoint.latitude},${viewpoint.longitude}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Google Maps에서 보기
+                  </a>
+                </Button>
               </div>
             </div>
 
@@ -312,14 +183,7 @@ export default function ViewpointDetailPage({
 
             <div>
               <h2 className="text-2xl font-semibold mb-4">Posts</h2>
-              <ViewpointPosts
-                posts={viewpoint.posts}
-                viewpoint={{
-                  id: viewpoint.id,
-                  title: viewpoint.title,
-                  locationName: viewpoint.locationName,
-                }}
-              />
+              <ViewpointPosts posts={viewpoint.posts} />
             </div>
           </div>
         </div>
@@ -344,9 +208,6 @@ export default function ViewpointDetailPage({
                   <div>
                     <p className="font-semibold text-lg">
                       {viewpoint.createdBy.username}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(viewpoint.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
@@ -373,27 +234,6 @@ export default function ViewpointDetailPage({
               </div>
             </CardContent>
           </Card>
-
-          <Card>
-            <CardHeader>
-              <h2 className="text-lg font-semibold">Popular Tags</h2>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {["mountain", "lake", "forest", "sunset", "sunrise"].map(
-                  (tag) => (
-                    <Link
-                      key={tag}
-                      to={`/viewpoints?tag=${tag}`}
-                      className="text-sm text-muted-foreground hover:text-primary"
-                    >
-                      #{tag}
-                    </Link>
-                  )
-                )}
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
 
@@ -411,7 +251,7 @@ export default function ViewpointDetailPage({
           <div className="relative aspect-video">
             <img
               src={selectedPhoto?.url}
-              alt={selectedPhoto?.description}
+              alt={selectedPhoto?.description || ""}
               className="w-full h-full object-contain"
             />
           </div>

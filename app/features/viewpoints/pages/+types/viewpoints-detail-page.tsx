@@ -20,15 +20,37 @@ export namespace Route {
         id: string;
         title: string;
         description: string;
-        locationName: string;
+        location_name: string;
         latitude: number;
         longitude: number;
-        photos: {
-          id: string;
-          url: string;
-          description?: string;
+        photos: { id: string; url: string; description: string | null }[];
+        created_at: string;
+        created_by: string;
+        rating: number;
+        rating_count: number;
+        posts_count: number;
+        username: string;
+        profile_photos: { url: string; description: string | null }[];
+        posts: {
+          post_id: string;
+          title: string;
+          content: string;
+          created_at: string;
+          username: string;
+          profile_photos: { url: string; description: string | null }[];
         }[];
-        createdAt: Date;
+        relatedTrails: {
+          id: string;
+          title: string;
+          description: string;
+          distance: number;
+          elevation_gain: number;
+          estimated_time: number;
+          difficulty: "easy" | "moderate" | "hard" | "expert";
+          photos: { url: string; description: string | null }[];
+          rating: number;
+          rating_count: number;
+        }[];
         createdBy: {
           id: string;
           username: string;
@@ -37,34 +59,6 @@ export namespace Route {
           followersCount: number;
           followingCount: number;
         };
-        rating: number;
-        ratingCount: number;
-        postsCount: number;
-        posts: {
-          id: string;
-          title: string;
-          body: string;
-          visitedDate: Date;
-          weatherDescription: string;
-          createdAt: Date;
-          createdBy: {
-            id: string;
-            username: string;
-            profileImageUrl?: string;
-          };
-        }[];
-        relatedTrails: {
-          id: string;
-          title: string;
-          description: string;
-          distance: number;
-          elevationGain: number;
-          estimatedTime: number;
-          difficulty: "easy" | "moderate" | "hard" | "expert";
-          thumbnailPhotoUrl: string;
-          rating: number;
-          ratingCount: number;
-        }[];
       };
     };
   };
