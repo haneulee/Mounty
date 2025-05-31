@@ -94,7 +94,7 @@ export function TrailCard({
                 <Avatar className="size-6 border-2 border-white">
                   <AvatarImage src={created_by_photos} />
                   <AvatarFallback className="bg-white/20 text-white">
-                    {created_by_username[0].toUpperCase()}
+                    {created_by_username?.[0]?.toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <span className="text-sm text-white/80 line-clamp-1">
@@ -104,9 +104,10 @@ export function TrailCard({
               <div className="flex items-center gap-2 text-sm text-white/80">
                 <ClockIcon className="size-4" />
                 <span>
-                  {formatDistanceToNow(created_at, {
-                    addSuffix: true,
-                  })}
+                  {created_at &&
+                    formatDistanceToNow(new Date(created_at), {
+                      addSuffix: true,
+                    })}
                 </span>
               </div>
             </div>

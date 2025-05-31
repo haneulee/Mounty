@@ -1,14 +1,28 @@
 import { Button } from "~/common/components/ui/button";
 import { Link } from "react-router";
+import type { Post } from "~/features/community/components/post-card";
 import { PostCard } from "~/features/community/components/post-card";
 import type { Route } from "~/types";
 import { TrailMarquee } from "~/features/trails/components/trail-marquee";
+import type { Viewpoint } from "~/features/viewpoints/components/viewpoint-card";
 import { ViewpointCard } from "~/features/viewpoints/components/viewpoint-card";
+import { useGetPosts } from "~/features/community/queries";
+import { useGetTrails } from "~/features/trails/queries";
+import { useGetViewpoints } from "~/features/viewpoints/queries";
 
-export function loader({ request }: Route.LoaderArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
+  const [viewpoints, trails, posts] = await Promise.all([
+    useGetViewpoints({ page: 1, pageSize: 10, sortBy: "popular" }),
+    useGetTrails({ page: 1, pageSize: 10, sortBy: "popular" }),
+    useGetPosts({ page: 1, pageSize: 10, sortBy: "newest" }),
+  ]);
+
   return {
     title: "홈",
     description: "Mounty에 오신 것을 환영합니다",
+    viewpoints: viewpoints.data as Viewpoint[],
+    trails: trails.data,
+    posts: posts.data as Post[],
   };
 }
 
@@ -24,6 +38,8 @@ export const meta: Route.MetaFunction = () => {
 };
 
 export default function HomePage({ loaderData }: Route.ComponentProps) {
+  const { viewpoints, trails, posts } = loaderData;
+
   return (
     <div className="p-4 sm:p-6 lg:p-20 space-y-8 sm:space-y-12">
       <section>
@@ -40,22 +56,8 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
             </Button>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2 sm:gap-4 lg:gap-6">
-            {Array.from({ length: 10 }).map((_, index) => (
-              <ViewpointCard
-                key={`viewpointId-${index}`}
-                id={`viewpointId-${index}`}
-                title="Seoraksan Sunrise Peak"
-                description="A stunning viewpoint offering panoramic views of the East Sea and surrounding mountains"
-                locationName="Seoraksan National Park"
-                latitude={38.1234}
-                longitude={128.5678}
-                thumbnailPhotoUrl="https://via.placeholder.com/150"
-                createdAt={new Date()}
-                createdBy={{
-                  id: "1",
-                  username: "MountainPhotographer",
-                }}
-              />
+            {viewpoints.map((viewpoint: Viewpoint) => (
+              <ViewpointCard key={viewpoint.id} {...viewpoint} />
             ))}
           </div>
         </div>
@@ -74,7 +76,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
               <Link to="/trails">View all trails &rarr;</Link>
             </Button>
           </div>
-          <TrailMarquee pauseOnHover reverse />
+          <TrailMarquee trails={trails} pauseOnHover reverse />
         </div>
       </section>
 
@@ -92,25 +94,11 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
             </Button>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2 sm:gap-4 lg:gap-6">
-            {Array.from({ length: 11 }).map((_, index) => (
+            {posts.map((post: Post) => (
               <PostCard
-                key={`postId-${index}`}
-                id={`postId-${index}`}
-                title="My First Winter Ascent of Hallasan"
-                body="Conquering South Korea's highest peak in winter was both challenging and rewarding. Here's my journey to the summit."
-                visitedDate={new Date()}
-                weatherDescription="Snowy"
-                createdAt={new Date()}
-                createdBy={{
-                  id: "1",
-                  username: "WinterHiker",
-                  profileImageUrl: "https://github.com/apple.png",
-                }}
-                viewpoint={{
-                  id: "1",
-                  title: "Hallasan Summit",
-                  locationName: "Jeju Island",
-                }}
+                key={post.post_id}
+                post={post}
+                className="flex-col h-full"
               />
             ))}
           </div>

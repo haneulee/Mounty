@@ -1,16 +1,21 @@
+import type { Database } from "~/supa-client";
 import { Marquee } from "~/common/components/ui/marquee";
 import { TrailCard } from "./trail-card";
+
+type Trail = Database["public"]["Views"]["trails_list_view"]["Row"];
 
 interface TrailMarqueeProps {
   className?: string;
   reverse?: boolean;
   pauseOnHover?: boolean;
+  trails?: Trail[];
 }
 
 export function TrailMarquee({
   className,
   reverse,
   pauseOnHover,
+  trails,
 }: TrailMarqueeProps) {
   return (
     <Marquee
@@ -19,25 +24,24 @@ export function TrailMarquee({
       pauseOnHover={pauseOnHover}
       repeat={2}
     >
-      {Array.from({ length: 10 }).map((_, index) => (
+      {trails?.map((trail) => (
         <TrailCard
-          key={`trailId-${index}`}
-          id={`trailId-${index}`}
-          title="Trail Name"
-          description="Trail Description"
-          startLocation="Start Location"
-          endLocation="End Location"
-          distance={10}
-          elevationGain={100}
-          estimatedTime={10}
-          difficulty="Easy"
-          season="Spring"
-          thumbnailPhotoUrl="https://via.placeholder.com/150"
-          createdAt={new Date()}
-          createdBy={{
-            id: "1",
-            username: "Trail User",
-          }}
+          key={trail.id}
+          id={trail.id}
+          title={trail.title}
+          description={trail.description}
+          start_location={trail.start_location}
+          end_location={trail.end_location}
+          distance={trail.distance}
+          elevation_gain={trail.elevation_gain}
+          estimated_time={trail.estimated_time}
+          difficulty={trail.difficulty}
+          season={trail.season}
+          thumbnail_photo_url={trail.thumbnail_photo_url}
+          created_at={new Date(trail.created_at)}
+          created_by_id={trail.created_by_id}
+          created_by_username={trail.created_by_username}
+          created_by_photos={trail.created_by_photos}
         />
       ))}
     </Marquee>

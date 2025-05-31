@@ -24,9 +24,10 @@ export type Post =
 
 export interface PostCardProps {
   post: Post;
+  className?: string;
 }
 
-export function PostCard({ post }: PostCardProps) {
+export function PostCard({ post, className }: PostCardProps) {
   if (!post) return null;
 
   const {
@@ -41,9 +42,14 @@ export function PostCard({ post }: PostCardProps) {
   } = post;
 
   return (
-    <div className="flex gap-4">
+    <div className={`flex gap-4 ${className || ""}`}>
       <Card className="flex-1 flex flex-col">
         <CardHeader className="p-3 sm:p-4 space-y-2">
+          {viewpoint_title && (
+            <Badge variant="outline" className="text-xs max-w-[120px] truncate">
+              {viewpoint_title}
+            </Badge>
+          )}
           <div className="flex items-center gap-3 justify-between">
             <div className="flex items-center gap-2 min-w-0">
               <Avatar className="size-8">
@@ -63,11 +69,6 @@ export function PostCard({ post }: PostCardProps) {
                 </span>
               </div>
             </div>
-            {viewpoint_title && (
-              <Badge variant="outline" className="text-xs whitespace-nowrap">
-                {viewpoint_title}
-              </Badge>
-            )}
           </div>
           <Link to={`/posts/${post_id}`} className="block mt-2">
             <h3 className="text-sm sm:text-base font-semibold line-clamp-2">
@@ -80,13 +81,15 @@ export function PostCard({ post }: PostCardProps) {
             {content}
           </p>
         </CardContent>
+        <CardFooter className="p-3 sm:p-4 pt-0">
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <ThumbsUp className="size-4" />
+            </Button>
+            <span className="text-sm font-medium">{upvote_count ?? 0}</span>
+          </div>
+        </CardFooter>
       </Card>
-      <div className="flex flex-col items-center justify-center gap-1 w-16">
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <ThumbsUp className="size-4" />
-        </Button>
-        <span className="text-sm font-medium">{upvote_count ?? 0}</span>
-      </div>
     </div>
   );
 }
