@@ -31,7 +31,7 @@ interface TrailCardProps {
   created_at: Date;
   created_by_id: string;
   created_by_username: string;
-  created_by_photos?: string;
+  created_by_photos?: { url: string }[];
 }
 
 export function TrailCard({
@@ -92,7 +92,7 @@ export function TrailCard({
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
                 <Avatar className="size-6 border-2 border-white">
-                  <AvatarImage src={created_by_photos} />
+                  <AvatarImage src={created_by_photos?.[0]?.url} />
                   <AvatarFallback className="bg-white/20 text-white">
                     {created_by_username?.[0]?.toUpperCase()}
                   </AvatarFallback>

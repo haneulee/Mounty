@@ -92,3 +92,54 @@ export async function useGetTrails({
     currentPage: page,
   };
 }
+
+interface GetTrailDetailOptions {
+  trailId: string;
+}
+
+export async function useGetTrailDetail({ trailId }: GetTrailDetailOptions) {
+  const { data: trail, error: trailError } = await supabase
+    .from("trails_list_view")
+    .select("*")
+    .eq("id", trailId)
+    .single();
+
+  if (trailError) {
+    throw new Error(trailError.message);
+  }
+
+  // Get viewpoints
+  const { data: viewpoints, error: viewpointsError } = await supabase
+    .from("viewpoints_list_view")
+    .select("*")
+    .eq("id", trail.viewpoint_id)
+    .order("created_at", { ascending: false });
+
+  if (viewpointsError) {
+    throw new Error(viewpointsError.message);
+  }
+
+  // Get author profile
+  const { data: author, error: authorError } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("profile_id", trail.created_by_id)
+    .single();
+
+  if (authorError) {
+    throw new Error(authorError.message);
+  }
+
+  return {
+    ...trail,
+    viewpoints: viewpoints || [],
+    createdBy: {
+      id: author.profile_id,
+      username: author.username,
+      profileImageUrl: author.photos?.[0]?.url,
+      bio: author.bio,
+      followersCount: author.followers_count,
+      followingCount: author.following_count,
+    },
+  };
+}

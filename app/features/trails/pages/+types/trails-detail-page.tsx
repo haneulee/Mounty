@@ -20,14 +20,33 @@ export namespace Route {
         id: string;
         title: string;
         description: string;
-        startLocation: string;
-        endLocation: string;
+        start_location: string;
+        end_location: string;
         distance: number;
-        elevationGain: number;
-        estimatedTime: number;
+        elevation_gain: number;
+        estimated_time: number;
         difficulty: "easy" | "moderate" | "hard" | "expert";
-        thumbnailPhotoUrl: string;
-        createdAt: Date;
+        season: string;
+        photos: { id: string; url: string; description: string | null }[];
+        gpx: string;
+        created_at: string;
+        created_by: string;
+        rating: number;
+        rating_count: number;
+        posts_count: number;
+        viewpoints: {
+          id: string;
+          title: string;
+          location_name: string;
+          latitude: number;
+          longitude: number;
+          photos: { id: string; url: string; description: string | null }[];
+          rating: number;
+          rating_count: number;
+          created_at: string;
+          username: string;
+          profile_photos: { url: string; description: string | null }[];
+        }[];
         createdBy: {
           id: string;
           username: string;
@@ -36,14 +55,6 @@ export namespace Route {
           followersCount: number;
           followingCount: number;
         };
-        rating: number;
-        ratingCount: number;
-        postsCount: number;
-        viewpoints: {
-          id: string;
-          title: string;
-          locationName: string;
-        }[];
       };
     };
   };

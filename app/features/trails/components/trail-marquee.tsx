@@ -41,7 +41,7 @@ export function TrailMarquee({
           created_at={new Date(trail.created_at)}
           created_by_id={trail.created_by_id}
           created_by_username={trail.created_by_username}
-          created_by_photos={trail.created_by_photos}
+          created_by_photos={trail.created_by_photos as { url: string }[]}
         />
       ))}
     </Marquee>

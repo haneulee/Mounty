@@ -12,88 +12,27 @@ import {
 } from "~/common/components/ui/breadcrumb";
 import { Card, CardContent, CardHeader } from "~/common/components/ui/card";
 import { ClockIcon, MapPinIcon, MountainIcon, StarIcon } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "~/common/components/ui/dialog";
 
 import { Button } from "~/common/components/ui/button";
 import { Link } from "react-router";
 import type { Route } from "./+types/trails-detail-page";
 import { formatDistanceToNow } from "date-fns";
+import { ko } from "date-fns/locale";
+import { useGetTrailDetail } from "../queries";
+import { useState } from "react";
 
-interface Trail {
-  id: string;
-  title: string;
-  description: string;
-  startLocation: string;
-  endLocation: string;
-  distance: number;
-  elevationGain: number;
-  estimatedTime: number;
-  difficulty: "easy" | "moderate" | "hard" | "expert";
-  thumbnailPhotoUrl: string;
-  createdAt: Date;
-  createdBy: {
-    id: string;
-    username: string;
-    profileImageUrl?: string;
-    bio?: string;
-    followersCount: number;
-    followingCount: number;
-  };
-  rating: number;
-  ratingCount: number;
-  postsCount: number;
-  viewpoints: {
-    id: string;
-    title: string;
-    locationName: string;
-  }[];
-}
+export async function loader({ request, params }: Route.LoaderArgs) {
+  const trail = await useGetTrailDetail({
+    trailId: params.trailId,
+  });
 
-export function loader({ request, params }: Route.LoaderArgs) {
-  // TODO: 실제 데이터베이스에서 트레일 데이터를 가져오도록 수정
-  return {
-    trail: {
-      id: params.trailId,
-      title: "Everest Base Camp Trek",
-      description:
-        "The Everest Base Camp Trek is one of the most popular trekking routes in Nepal. This challenging yet rewarding trail takes you through beautiful Sherpa villages, Buddhist monasteries, and stunning mountain landscapes. The journey culminates at the base camp of the world's highest mountain, offering breathtaking views of the Khumbu Icefall and surrounding peaks.",
-      startLocation: "Lukla, Nepal",
-      endLocation: "Everest Base Camp, Nepal",
-      distance: 130, // km
-      elevationGain: 2800, // meters
-      estimatedTime: 12, // days
-      difficulty: "hard",
-      thumbnailPhotoUrl: "https://github.com/haneulee.png",
-      createdAt: new Date(),
-      createdBy: {
-        id: "1",
-        username: "john_doe",
-        profileImageUrl: "https://github.com/haneulee.png",
-        bio: "Adventure seeker and nature lover. Always looking for the next great view.",
-        followersCount: 1234,
-        followingCount: 567,
-      },
-      rating: 4.8,
-      ratingCount: 1234,
-      postsCount: 567,
-      viewpoints: [
-        {
-          id: "1",
-          title: "Namche Bazaar",
-          locationName: "Namche Bazaar, Nepal",
-        },
-        {
-          id: "2",
-          title: "Kala Patthar",
-          locationName: "Kala Patthar, Nepal",
-        },
-        {
-          id: "3",
-          title: "Everest Base Camp",
-          locationName: "Everest Base Camp, Nepal",
-        },
-      ],
-    } as Trail,
-  };
+  return { trail };
 }
 
 export function action({ request }: Route.ActionArgs) {
@@ -106,6 +45,9 @@ export const meta: Route.MetaFunction = () => {
 
 export default function TrailDetailPage({ loaderData }: Route.ComponentProps) {
   const { trail } = loaderData;
+  const [selectedPhoto, setSelectedPhoto] = useState<
+    (typeof trail.photos)[0] | null
+  >(null);
 
   return (
     <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
@@ -142,27 +84,43 @@ export default function TrailDetailPage({ loaderData }: Route.ComponentProps) {
                 <div className="flex items-center gap-2">
                   <MapPinIcon className="size-4" />
                   <span>
-                    {trail.startLocation} → {trail.endLocation}
+                    {trail.start_location} → {trail.end_location}
                   </span>
                 </div>
                 <span>·</span>
                 <div className="flex items-center gap-2">
                   <StarIcon className="size-4" />
                   <span>
-                    {trail.rating.toFixed(1)} ({trail.ratingCount} ratings)
+                    {trail.rating.toFixed(1)} ({trail.rating_count} ratings)
                   </span>
                 </div>
                 <span>·</span>
-                <span>{trail.postsCount} posts</span>
+                <span>{trail.posts_count} posts</span>
+                <span>·</span>
+                <span>
+                  {formatDistanceToNow(new Date(trail.created_at), {
+                    addSuffix: true,
+                    locale: ko,
+                  })}
+                </span>
               </div>
             </div>
 
-            <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-              <img
-                src={trail.thumbnailPhotoUrl}
-                alt={trail.title}
-                className="w-full h-full object-cover"
-              />
+            {/* 이미지 갤러리 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {trail.photos?.map((photo) => (
+                <div
+                  key={photo.id}
+                  className="cursor-pointer"
+                  onClick={() => setSelectedPhoto(photo)}
+                >
+                  <img
+                    src={photo.url}
+                    alt={photo.description || ""}
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                </div>
+              ))}
             </div>
 
             <div className="prose prose-lg dark:prose-invert max-w-none">
@@ -185,7 +143,7 @@ export default function TrailDetailPage({ loaderData }: Route.ComponentProps) {
                     <MountainIcon className="size-4" />
                     <span className="font-medium">Elevation Gain</span>
                   </div>
-                  <p className="text-2xl font-bold">{trail.elevationGain} m</p>
+                  <p className="text-2xl font-bold">{trail.elevation_gain} m</p>
                 </CardContent>
               </Card>
               <Card>
@@ -195,7 +153,7 @@ export default function TrailDetailPage({ loaderData }: Route.ComponentProps) {
                     <span className="font-medium">Estimated Time</span>
                   </div>
                   <p className="text-2xl font-bold">
-                    {trail.estimatedTime} days
+                    {trail.estimated_time} days
                   </p>
                 </CardContent>
               </Card>
@@ -209,8 +167,17 @@ export default function TrailDetailPage({ loaderData }: Route.ComponentProps) {
                     <CardContent className="pt-6">
                       <h3 className="font-semibold mb-2">{viewpoint.title}</h3>
                       <p className="text-muted-foreground mb-4">
-                        {viewpoint.locationName}
+                        {viewpoint.location_name}
                       </p>
+                      <div className="flex items-center gap-2 mb-4">
+                        <StarIcon className="size-4 text-yellow-400" />
+                        <span className="font-medium">
+                          {viewpoint.rating.toFixed(1)}
+                        </span>
+                        <span className="text-muted-foreground">
+                          ({viewpoint.rating_count} reviews)
+                        </span>
+                      </div>
                       <Button variant="link" asChild>
                         <Link to={`/viewpoints/${viewpoint.id}`}>
                           View details &rarr;
@@ -226,40 +193,73 @@ export default function TrailDetailPage({ loaderData }: Route.ComponentProps) {
 
         <div className="w-full lg:w-80 space-y-6">
           <Card>
-            <CardHeader className="flex flex-row items-center gap-4">
-              <Avatar className="size-16">
-                <AvatarImage src={trail.createdBy.profileImageUrl} />
-                <AvatarFallback>
-                  {trail.createdBy.username[0].toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="font-semibold">{trail.createdBy.username}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {trail.createdBy.bio}
-                </p>
-              </div>
+            <CardHeader>
+              <h2 className="text-lg font-semibold">Author</h2>
             </CardHeader>
             <CardContent>
-              <div className="flex gap-4 mb-4">
-                <div>
-                  <div className="font-medium">
-                    {trail.createdBy.followersCount}
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-16 w-16">
+                    <AvatarImage
+                      src={trail.createdBy.profileImageUrl}
+                      alt={trail.createdBy.username}
+                    />
+                    <AvatarFallback>
+                      {trail.createdBy.username[0].toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-semibold text-lg">
+                      {trail.createdBy.username}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {trail.createdBy.bio}
+                    </p>
                   </div>
-                  <div className="text-sm text-muted-foreground">Followers</div>
                 </div>
-                <div>
-                  <div className="font-medium">
-                    {trail.createdBy.followingCount}
+                <div className="flex items-center gap-4 text-sm">
+                  <div>
+                    <span className="font-semibold">
+                      {trail.createdBy.followersCount}
+                    </span>
+                    <span className="text-muted-foreground"> followers</span>
                   </div>
-                  <div className="text-sm text-muted-foreground">Following</div>
+                  <div>
+                    <span className="font-semibold">
+                      {trail.createdBy.followingCount}
+                    </span>
+                    <span className="text-muted-foreground"> following</span>
+                  </div>
                 </div>
+                <Button variant="outline" className="w-full">
+                  Follow
+                </Button>
               </div>
-              <Button className="w-full">Follow</Button>
             </CardContent>
           </Card>
         </div>
       </div>
+
+      {/* 이미지 모달 */}
+      <Dialog
+        open={!!selectedPhoto}
+        onOpenChange={() => setSelectedPhoto(null)}
+      >
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>{selectedPhoto?.description}</span>
+            </DialogTitle>
+          </DialogHeader>
+          <div className="relative aspect-video">
+            <img
+              src={selectedPhoto?.url}
+              alt={selectedPhoto?.description || ""}
+              className="w-full h-full object-contain"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
