@@ -7,6 +7,7 @@ import {
   Scripts,
   ScrollRestoration,
   isRouteErrorResponse,
+  useLoaderData,
   useLocation,
   useNavigation,
 } from "react-router";
@@ -28,7 +29,17 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+export async function loader() {
+  return {
+    ENV: {
+      GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY,
+    },
+  };
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
+  const { ENV } = useLoaderData<typeof loader>();
+
   return (
     <html lang="en" className="dark">
       <head>
@@ -41,6 +52,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <main>{children}</main>
         <ScrollRestoration />
         <Scripts />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(ENV)}`,
+          }}
+        />
       </body>
     </html>
   );

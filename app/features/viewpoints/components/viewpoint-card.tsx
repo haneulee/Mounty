@@ -23,8 +23,7 @@ export function ViewpointCard({ ...viewpoint }: ViewpointCardProps) {
     id,
     title,
     description,
-    latitude,
-    longitude,
+    location_name,
     created_at,
     username,
     photos,
@@ -74,7 +73,7 @@ export function ViewpointCard({ ...viewpoint }: ViewpointCardProps) {
                 variant="secondary"
                 className="text-xs bg-white/20 hover:bg-white/30 text-white border-0"
               >
-                {/* {locationName} */}
+                {location_name}
               </Badge>
             </div>
           </div>

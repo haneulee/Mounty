@@ -29,7 +29,16 @@ import { ko } from "date-fns/locale";
 import { useGetViewpointDetail } from "../queries";
 import { useState } from "react";
 
-const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
+declare global {
+  interface Window {
+    ENV: {
+      GOOGLE_MAPS_API_KEY: string;
+    };
+  }
+}
+
+const GOOGLE_MAPS_API_KEY =
+  typeof window !== "undefined" ? window.ENV?.GOOGLE_MAPS_API_KEY : null;
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const viewpoint = await useGetViewpointDetail({
@@ -146,31 +155,33 @@ export default function ViewpointDetailPage({
             </div>
 
             {/* 구글 맵 */}
-            <div className="border-t pt-8">
-              <h2 className="text-2xl font-semibold mb-4">Location</h2>
-              <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-                <iframe
-                  src={`https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_API_KEY}&q=${viewpoint.latitude},${viewpoint.longitude}&zoom=15`}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
+            {GOOGLE_MAPS_API_KEY && (
+              <div className="border-t pt-8">
+                <h2 className="text-2xl font-semibold mb-4">Location</h2>
+                <div className="aspect-video bg-muted rounded-lg overflow-hidden">
+                  <iframe
+                    src={`https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_API_KEY}&q=${viewpoint.latitude},${viewpoint.longitude}&zoom=15`}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
+                <div className="mt-4 flex justify-end">
+                  <Button variant="outline" asChild>
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${viewpoint.latitude},${viewpoint.longitude}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Google Maps에서 보기
+                    </a>
+                  </Button>
+                </div>
               </div>
-              <div className="mt-4 flex justify-end">
-                <Button variant="outline" asChild>
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${viewpoint.latitude},${viewpoint.longitude}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Google Maps에서 보기
-                  </a>
-                </Button>
-              </div>
-            </div>
+            )}
 
             <div>
               <h2 className="text-2xl font-semibold mb-4">Related Trails</h2>

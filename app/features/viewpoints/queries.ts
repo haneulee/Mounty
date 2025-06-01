@@ -1,5 +1,22 @@
 import { supabase } from "~/supa-client";
 
+export interface Viewpoint {
+  id: string;
+  title: string;
+  description: string;
+  location_name: string;
+  latitude: number;
+  longitude: number;
+  photos: { id: string; url: string; description: string | null }[];
+  created_at: string;
+  created_by: string;
+  rating: number;
+  rating_count: number;
+  posts_count: number;
+  username: string;
+  profile_photos: { url: string; description: string | null }[];
+}
+
 interface GetViewpointsOptions {
   page?: number;
   pageSize?: number;
@@ -45,7 +62,7 @@ export async function useGetViewpoints({
 
   switch (sortBy) {
     case "popular":
-      query = query.order("posts_count", { ascending: false });
+      query = query.order("rating_count", { ascending: false });
       break;
     case "rating":
       query = query.order("rating", { ascending: false });
