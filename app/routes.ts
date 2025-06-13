@@ -39,6 +39,7 @@ export default [
   ...prefix("mypage", [
     ...prefix("profile", [index("features/users/pages/my-profile-page.tsx")]),
     ...prefix("favorite", [index("features/users/pages/my-favorite-page.tsx")]),
+    route("/welcome", "features/users/pages/welcome-page.tsx"),
   ]),
 
   // Auth routes
