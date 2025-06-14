@@ -15,6 +15,7 @@ import {
 import Navigation from "./common/components/navigation";
 import type { Route } from "./+types/root";
 import { cn } from "./lib/utils";
+import { makeSSRClient } from "./supa-client";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -29,8 +30,13 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
-export async function loader() {
+export async function loader({ request }: Route.LoaderArgs) {
+  const { client } = makeSSRClient(request);
+  const {
+    data: { user },
+  } = await client.auth.getUser();
   return {
+    user,
     ENV: {
       GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY,
     },
@@ -62,10 +68,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function App() {
+export default function App({ loaderData }: Route.ComponentProps) {
   const { pathname } = useLocation();
   const navigation = useNavigation();
   const isLoading = navigation.state === "loading";
+  const isLoggedIn = !!loaderData.user;
   return (
     <div
       className={cn({
@@ -74,7 +81,7 @@ export default function App() {
       })}
     >
       {pathname.includes("/auth") ? null : (
-        <Navigation isLoggedIn={true} hasNotifications={true} />
+        <Navigation isLoggedIn={isLoggedIn} hasNotifications={true} />
       )}
       <Outlet />
     </div>
