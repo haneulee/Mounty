@@ -21,83 +21,6 @@ import type { Route } from "~/types";
 import { getUserById } from "../queries";
 import { makeSSRClient } from "~/supa-client";
 
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  bio?: string;
-  profileImageUrl?: string;
-  followersCount: number;
-  followingCount: number;
-  postsCount: number;
-  trailsCount: number;
-  viewpointsCount: number;
-}
-
-interface Viewpoint {
-  id: string;
-  title: string;
-  description: string;
-  locationName: string;
-  latitude: number;
-  longitude: number;
-  thumbnailPhotoUrl?: string;
-  createdAt: Date;
-  createdBy: {
-    id: string;
-    username: string;
-    profileImageUrl?: string;
-  };
-}
-
-interface Trail {
-  id: string;
-  title: string;
-  description: string;
-  startLocation: string;
-  endLocation: string;
-  distance: number;
-  elevationGain: number;
-  estimatedTime: number;
-  difficulty: string;
-  season: string;
-  thumbnailPhotoUrl: string;
-  createdAt: Date;
-  createdBy: {
-    id: string;
-    username: string;
-    profileImageUrl?: string;
-  };
-}
-
-interface Post {
-  id: string;
-  title: string;
-  content: string;
-  thumbnailPhotoUrl?: string;
-  createdAt: Date;
-  createdBy: {
-    id: string;
-    username: string;
-    profileImageUrl?: string;
-  };
-}
-
-interface Comment {
-  id: string;
-  content: string;
-  createdAt: Date;
-  post: {
-    id: string;
-    title: string;
-  };
-  createdBy: {
-    id: string;
-    username: string;
-    profileImageUrl?: string;
-  };
-}
-
 export async function loader({ request }: Route.LoaderArgs) {
   const { client, headers } = makeSSRClient(request);
   const {
@@ -133,7 +56,7 @@ export default function MyProfilePage({ loaderData }: Route.ComponentProps) {
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8 mb-8">
           <div className="flex-shrink-0">
             <Avatar className="size-24 sm:size-32">
-              <AvatarImage src={user.profileImageUrl} />
+              <AvatarImage src={profile.photos?.[0] || ""} />
               <AvatarFallback className="text-2xl">
                 {profile.username?.slice(0, 1).toUpperCase() || "U"}
               </AvatarFallback>
@@ -147,27 +70,29 @@ export default function MyProfilePage({ loaderData }: Route.ComponentProps) {
                 </h1>
                 <div className="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-6">
                   <div>
-                    <div className="font-medium">{user.followersCount}</div>
+                    <div className="font-medium">{profile.followers_count}</div>
                     <div className="text-sm text-muted-foreground">
                       Followers
                     </div>
                   </div>
                   <div>
-                    <div className="font-medium">{user.followingCount}</div>
+                    <div className="font-medium">{profile.following_count}</div>
                     <div className="text-sm text-muted-foreground">
                       Following
                     </div>
                   </div>
                   <div>
-                    <div className="font-medium">{user.postsCount}</div>
+                    <div className="font-medium">{profile.posts_count}</div>
                     <div className="text-sm text-muted-foreground">Posts</div>
                   </div>
                   <div>
-                    <div className="font-medium">{user.trailsCount}</div>
+                    <div className="font-medium">{profile.trails_count}</div>
                     <div className="text-sm text-muted-foreground">Trails</div>
                   </div>
                   <div>
-                    <div className="font-medium">{user.viewpointsCount}</div>
+                    <div className="font-medium">
+                      {profile.viewpoints_count}
+                    </div>
                     <div className="text-sm text-muted-foreground">
                       Viewpoints
                     </div>
@@ -218,7 +143,7 @@ export default function MyProfilePage({ loaderData }: Route.ComponentProps) {
           </TabsList>
 
           <TabsContent value="edit-profile">
-            <EditProfile user={user} />
+            <EditProfile profile={profile} />
           </TabsContent>
 
           <TabsContent value="change-password">

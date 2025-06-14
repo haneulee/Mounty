@@ -18,7 +18,8 @@ begin
                     following_count,
                     posts_count,
                     trails_count,
-                    viewpoints_count
+                    viewpoints_count,
+                    photos
                 )
                 values (
                     new.id,
@@ -30,7 +31,8 @@ begin
                     0,
                     0,
                     0,
-                    0
+                    0,
+                    '[]'::jsonb
                 );
             else
                 insert into public.profiles (
@@ -43,7 +45,8 @@ begin
                     following_count,
                     posts_count,
                     trails_count,
-                    viewpoints_count
+                    viewpoints_count,
+                    photos
                 )
                 values (
                     new.id,
@@ -55,9 +58,68 @@ begin
                     0,
                     0,
                     0,
-                    0
+                    0,
+                    '[]'::jsonb
                 );
             end if;
+        end if;
+
+        if new.raw_app_meta_data ? 'provider' AND new.raw_app_meta_data ->> 'provider' = 'kakao' then
+            insert into public.profiles (
+                profile_id, 
+                name, 
+                username, 
+                email, 
+                password, 
+                followers_count, 
+                following_count, 
+                posts_count, 
+                trails_count, 
+                viewpoints_count, 
+                photos
+            )
+            values (
+                new.id, 
+                new.raw_user_meta_data ->> 'name', 
+                new.raw_user_meta_data ->> 'preferred_username' || substr(md5(random()::text), 1, 5), 
+                new.email, 
+                new.encrypted_password, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                jsonb_build_array(new.raw_user_meta_data ->> 'avatar_url')
+            );
+        end if;
+
+        if new.raw_app_meta_data ? 'provider' AND new.raw_app_meta_data ->> 'provider' = 'github' then
+            insert into public.profiles (
+                profile_id, 
+                name, 
+                username, 
+                email, 
+                password, 
+                followers_count, 
+                following_count, 
+                posts_count, 
+                trails_count, 
+                viewpoints_count, 
+                photos
+            )
+            values (
+                new.id, 
+                new.raw_user_meta_data ->> 'full_name', 
+                new.raw_user_meta_data ->> 'user_name' || substr(md5(random()::text), 1, 5), 
+                new.email, 
+                new.encrypted_password, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0, 
+                jsonb_build_array(new.raw_user_meta_data ->> 'avatar_url')
+            );
         end if;
     end if;
     return new;

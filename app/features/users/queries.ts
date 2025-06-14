@@ -18,7 +18,9 @@ export const getUserProfile = async (
           following_count,
           posts_count,
           trails_count,
-          viewpoints_count
+          viewpoints_count,
+          photos,
+          bio
           `
     )
     .eq("username", username)
@@ -46,7 +48,9 @@ export const getUserById = async (
           following_count,
           posts_count,
           trails_count,
-          viewpoints_count
+          viewpoints_count,
+          photos,
+          bio
           `
     )
     .eq("profile_id", id)

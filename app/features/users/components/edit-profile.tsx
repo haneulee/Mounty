@@ -5,14 +5,16 @@ import { Input } from "~/common/components/ui/input";
 import { Textarea } from "~/common/components/ui/textarea";
 
 interface EditProfileProps {
-  user: {
+  profile: {
     username: string;
     email: string;
+    name?: string;
     bio?: string;
+    photos?: string[];
   };
 }
 
-export function EditProfile({ user }: EditProfileProps) {
+export function EditProfile({ profile }: EditProfileProps) {
   return (
     <Card>
       <CardHeader>
@@ -21,18 +23,28 @@ export function EditProfile({ user }: EditProfileProps) {
       <CardContent>
         <form className="space-y-4 sm:space-y-6">
           <div className="space-y-2">
+            <label htmlFor="name" className="text-sm font-medium">
+              Name
+            </label>
+            <Input
+              id="name"
+              name="name"
+              defaultValue={profile.name}
+              className="w-full"
+            />
+          </div>
+          <div className="space-y-2">
             <label htmlFor="username" className="text-sm font-medium">
               Username
             </label>
             <Input
               id="username"
               name="username"
-              defaultValue={user.username}
+              defaultValue={profile.username}
               required
               className="w-full"
             />
           </div>
-
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-medium">
               Email
@@ -41,12 +53,11 @@ export function EditProfile({ user }: EditProfileProps) {
               id="email"
               name="email"
               type="email"
-              defaultValue={user.email}
+              defaultValue={profile.email}
               required
               className="w-full"
             />
           </div>
-
           <div className="space-y-2">
             <label htmlFor="bio" className="text-sm font-medium">
               Bio
@@ -54,12 +65,10 @@ export function EditProfile({ user }: EditProfileProps) {
             <Textarea
               id="bio"
               name="bio"
-              defaultValue={user.bio}
-              placeholder="Tell us about yourself"
+              defaultValue={profile.bio}
               className="w-full min-h-[100px]"
             />
           </div>
-
           <div className="space-y-2">
             <label htmlFor="profileImage" className="text-sm font-medium">
               Profile Image

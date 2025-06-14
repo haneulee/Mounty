@@ -52,10 +52,13 @@ export default [
           route("/start", "features/auth/pages/otp-start-page.tsx"),
           route("/complete", "features/auth/pages/otp-complete-page.tsx"),
         ]),
-        ...prefix("/social/:provider", [
-          route("/start", "features/auth/pages/social-start-page.tsx"),
-          route("/complete", "features/auth/pages/social-complete-page.tsx"),
-        ]),
+      ]),
+      ...prefix("social", [
+        route("/:provider/start", "features/auth/pages/social-start-page.tsx"),
+        route(
+          "/:provider/complete",
+          "features/auth/pages/social-complete-page.tsx"
+        ),
       ]),
       ...prefix("logout", [index("features/auth/pages/logout-page.tsx")]),
     ]),

@@ -1,6 +1,7 @@
 export namespace Route {
   export interface LoaderArgs {
     request: Request;
+    params: Record<string, string>;
   }
 
   export interface ActionArgs {
