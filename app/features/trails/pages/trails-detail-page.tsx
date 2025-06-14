@@ -24,11 +24,13 @@ import { Link } from "react-router";
 import type { Route } from "./+types/trails-detail-page";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
+import { makeSSRClient } from "~/supa-client";
 import { useGetTrailDetail } from "../queries";
 import { useState } from "react";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const trail = await useGetTrailDetail({
+  const { client, headers } = makeSSRClient(request);
+  const trail = await useGetTrailDetail(client, {
     trailId: params.trailId,
   });
 

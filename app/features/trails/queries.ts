@@ -1,6 +1,7 @@
 import { DIFFICULTY_VALUES, SEASON_VALUES } from "./constants";
 
-import { supabase } from "~/supa-client";
+import type { Database } from "~/supa-client";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 interface GetTrailsOptions {
   page?: number;
@@ -12,19 +13,22 @@ interface GetTrailsOptions {
   season?: (typeof SEASON_VALUES)[number];
 }
 
-export async function useGetTrails({
-  page = 1,
-  pageSize = 12,
-  sortBy = "newest",
-  period = "all",
-  search,
-  difficulty,
-  season,
-}: GetTrailsOptions = {}) {
+export async function useGetTrails(
+  client: SupabaseClient<Database>,
+  {
+    page = 1,
+    pageSize = 12,
+    sortBy = "newest",
+    period = "all",
+    search,
+    difficulty,
+    season,
+  }: GetTrailsOptions = {}
+) {
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  let query = supabase.from("trails_list_view").select("*", { count: "exact" });
+  let query = client.from("trails_list_view").select("*", { count: "exact" });
 
   // 검색어가 있는 경우 검색 조건 추가
   if (search) {
@@ -97,8 +101,11 @@ interface GetTrailDetailOptions {
   trailId: string;
 }
 
-export async function useGetTrailDetail({ trailId }: GetTrailDetailOptions) {
-  const { data: trail, error: trailError } = await supabase
+export async function useGetTrailDetail(
+  client: SupabaseClient<Database>,
+  { trailId }: GetTrailDetailOptions
+) {
+  const { data: trail, error: trailError } = await client
     .from("trails_list_view")
     .select("*")
     .eq("id", trailId)
@@ -109,7 +116,7 @@ export async function useGetTrailDetail({ trailId }: GetTrailDetailOptions) {
   }
 
   // Get viewpoints
-  const { data: viewpoints, error: viewpointsError } = await supabase
+  const { data: viewpoints, error: viewpointsError } = await client
     .from("viewpoints_list_view")
     .select("*")
     .eq("id", trail.viewpoint_id)
@@ -120,7 +127,7 @@ export async function useGetTrailDetail({ trailId }: GetTrailDetailOptions) {
   }
 
   // Get author profile
-  const { data: author, error: authorError } = await supabase
+  const { data: author, error: authorError } = await client
     .from("profiles")
     .select("*")
     .eq("profile_id", trail.created_by_id)

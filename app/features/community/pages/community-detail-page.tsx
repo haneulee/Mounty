@@ -26,11 +26,13 @@ import type { Route } from "./+types/community-detail-page";
 import { Textarea } from "~/common/components/ui/textarea";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
+import { makeSSRClient } from "~/supa-client";
 import { useGetPostDetail } from "../queries";
 import { useState } from "react";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const post = await useGetPostDetail({
+  const { client, headers } = makeSSRClient(request);
+  const post = await useGetPostDetail(client, {
     postId: params.postId,
   });
 

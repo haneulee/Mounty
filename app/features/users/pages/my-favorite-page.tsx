@@ -9,6 +9,7 @@ import {
 import type { Route } from "~/types";
 import { TrailCard } from "~/features/trails/components/trail-card";
 import { ViewpointCard } from "~/features/viewpoints/components/viewpoint-card";
+import { makeSSRClient } from "~/supa-client";
 
 interface Viewpoint {
   id: string;
@@ -60,6 +61,7 @@ interface Post {
 }
 
 export function loader({ request }: Route.LoaderArgs) {
+  const { client, headers } = makeSSRClient(request);
   return {
     viewpoints: [
       {

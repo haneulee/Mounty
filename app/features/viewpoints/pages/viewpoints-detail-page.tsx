@@ -26,6 +26,7 @@ import { Star } from "lucide-react";
 import { ViewpointPosts } from "../components/viewpoint-posts";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
+import { makeSSRClient } from "~/supa-client";
 import { useGetViewpointDetail } from "../queries";
 import { useState } from "react";
 
@@ -41,7 +42,8 @@ const GOOGLE_MAPS_API_KEY =
   typeof window !== "undefined" ? window.ENV?.GOOGLE_MAPS_API_KEY : null;
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const viewpoint = await useGetViewpointDetail({
+  const { client, headers } = makeSSRClient(request);
+  const viewpoint = await useGetViewpointDetail(client, {
     viewpointId: params.viewpointId,
   });
 

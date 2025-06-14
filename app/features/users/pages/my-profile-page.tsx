@@ -19,6 +19,7 @@ import { MyContent } from "~/features/users/components/my-content";
 import type { Route } from "~/types";
 import { Separator } from "~/common/components/ui/separator";
 import { Textarea } from "~/common/components/ui/textarea";
+import { makeSSRClient } from "~/supa-client";
 
 interface User {
   id: string;
@@ -98,6 +99,7 @@ interface Comment {
 }
 
 export function loader({ request }: Route.LoaderArgs) {
+  const { client, headers } = makeSSRClient(request);
   return {
     user: {
       id: "1",

@@ -1,4 +1,5 @@
-import { supabase } from "~/supa-client";
+import type { Database } from "~/supa-client";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export interface Viewpoint {
   id: string;
@@ -25,17 +26,20 @@ interface GetViewpointsOptions {
   search?: string;
 }
 
-export async function useGetViewpoints({
-  page = 1,
-  pageSize = 12,
-  sortBy = "newest",
-  period = "all",
-  search,
-}: GetViewpointsOptions = {}) {
+export async function useGetViewpoints(
+  client: SupabaseClient<Database>,
+  {
+    page = 1,
+    pageSize = 12,
+    sortBy = "newest",
+    period = "all",
+    search,
+  }: GetViewpointsOptions = {}
+) {
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  let query = supabase
+  let query = client
     .from("viewpoints_list_view")
     .select("*", { count: "exact" });
 
@@ -89,10 +93,11 @@ interface GetViewpointDetailOptions {
   viewpointId: string;
 }
 
-export async function useGetViewpointDetail({
-  viewpointId,
-}: GetViewpointDetailOptions) {
-  const { data: viewpoint, error: viewpointError } = await supabase
+export async function useGetViewpointDetail(
+  client: SupabaseClient<Database>,
+  { viewpointId }: GetViewpointDetailOptions
+) {
+  const { data: viewpoint, error: viewpointError } = await client
     .from("viewpoints_list_view")
     .select("*")
     .eq("id", viewpointId)
@@ -103,7 +108,7 @@ export async function useGetViewpointDetail({
   }
 
   // Get posts
-  const { data: posts, error: postsError } = await supabase
+  const { data: posts, error: postsError } = await client
     .from("community_post_list_view")
     .select(
       `
@@ -120,7 +125,7 @@ export async function useGetViewpointDetail({
   }
 
   // Get related trails
-  const { data: trails, error: trailsError } = await supabase
+  const { data: trails, error: trailsError } = await client
     .from("trails_list_view")
     .select("*")
     .eq("viewpoint_id", viewpointId)
@@ -131,7 +136,7 @@ export async function useGetViewpointDetail({
   }
 
   // Get author profile
-  const { data: author, error: authorError } = await supabase
+  const { data: author, error: authorError } = await client
     .from("profiles")
     .select("*")
     .eq("profile_id", viewpoint.profile_id)

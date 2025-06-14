@@ -1,4 +1,5 @@
-import { supabase } from "~/supa-client";
+import type { Database } from "~/supa-client";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 interface GetPostsOptions {
   page?: number;
@@ -8,17 +9,20 @@ interface GetPostsOptions {
   search?: string;
 }
 
-export async function useGetPosts({
-  page = 1,
-  pageSize = 12,
-  sortBy = "newest",
-  period = "all",
-  search,
-}: GetPostsOptions = {}) {
+export async function useGetPosts(
+  client: SupabaseClient<Database>,
+  {
+    page = 1,
+    pageSize = 12,
+    sortBy = "newest",
+    period = "all",
+    search,
+  }: GetPostsOptions = {}
+) {
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  let query = supabase
+  let query = client
     .from("community_post_list_view")
     .select("*", { count: "exact" });
 
@@ -77,8 +81,11 @@ interface GetPostDetailOptions {
   postId: string;
 }
 
-export async function useGetPostDetail({ postId }: GetPostDetailOptions) {
-  const { data: post, error: postError } = await supabase
+export async function useGetPostDetail(
+  client: SupabaseClient<Database>,
+  { postId }: GetPostDetailOptions
+) {
+  const { data: post, error: postError } = await client
     .from("community_post_list_view")
     .select("*")
     .eq("post_id", postId)
@@ -89,7 +96,7 @@ export async function useGetPostDetail({ postId }: GetPostDetailOptions) {
   }
 
   // Get author profile
-  const { data: authorProfile, error: authorError } = await supabase
+  const { data: authorProfile, error: authorError } = await client
     .from("profiles")
     .select("profile_id, username, photos, followers_count, following_count")
     .eq("profile_id", post.profile_id)
@@ -100,7 +107,7 @@ export async function useGetPostDetail({ postId }: GetPostDetailOptions) {
   }
 
   // Get replies
-  const { data: replies, error: repliesError } = await supabase
+  const { data: replies, error: repliesError } = await client
     .from("post_replies")
     .select(
       `
@@ -124,7 +131,7 @@ export async function useGetPostDetail({ postId }: GetPostDetailOptions) {
   // Get viewpoints if exists
   let viewpoint = null;
   if (post.viewpoint_id) {
-    const { data: viewpointData, error: viewpointError } = await supabase
+    const { data: viewpointData, error: viewpointError } = await client
       .from("viewpoints_list_view")
       .select("*")
       .eq("id", post.viewpoint_id)
@@ -137,7 +144,7 @@ export async function useGetPostDetail({ postId }: GetPostDetailOptions) {
 
   // Get profiles for replies
   const profileIds = replies?.map((reply) => reply.profile_id) || [];
-  const { data: profiles, error: profilesError } = await supabase
+  const { data: profiles, error: profilesError } = await client
     .from("profiles")
     .select("profile_id, username, photos")
     .in("profile_id", profileIds);

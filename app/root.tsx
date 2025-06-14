@@ -38,7 +38,7 @@ export async function loader() {
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const { ENV } = useLoaderData<typeof loader>();
+  // const { ENV } = useLoaderData<typeof loader>();
 
   return (
     <html lang="en" className="dark">
@@ -52,11 +52,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <main>{children}</main>
         <ScrollRestoration />
         <Scripts />
-        <script
+        {/* <script
           dangerouslySetInnerHTML={{
             __html: `window.ENV = ${JSON.stringify(ENV)}`,
           }}
-        />
+        /> */}
       </body>
     </html>
   );

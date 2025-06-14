@@ -3,6 +3,7 @@ import { DIFFICULTY_VALUES, SEASON_VALUES } from "../constants";
 import { ContentLayout } from "~/common/components/layout/content-layout";
 import type { Route } from "~/types";
 import { TrailCard } from "~/features/trails/components/trail-card";
+import { makeSSRClient } from "~/supa-client";
 import { useGetTrails } from "../queries";
 import { useSearchParams } from "react-router";
 import { z } from "zod";
@@ -51,6 +52,7 @@ const searchParamsSchema = z.object({
 });
 
 export async function loader({ request }: Route.LoaderArgs) {
+  const { client, headers } = makeSSRClient(request);
   const url = new URL(request.url);
   const { success, data: parsedData } = searchParamsSchema.safeParse(
     Object.fromEntries(url.searchParams)
@@ -70,7 +72,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     data: trails,
     totalPages,
     currentPage,
-  } = await useGetTrails({
+  } = await useGetTrails(client, {
     page: parsedData.page || 1,
     sortBy: parsedData.sorting || "newest",
     period: parsedData.period || "all",

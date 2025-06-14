@@ -6,15 +6,17 @@ import type { Route } from "~/types";
 import { TrailMarquee } from "~/features/trails/components/trail-marquee";
 import type { Viewpoint } from "~/features/viewpoints/components/viewpoint-card";
 import { ViewpointCard } from "~/features/viewpoints/components/viewpoint-card";
+import { makeSSRClient } from "~/supa-client";
 import { useGetPosts } from "~/features/community/queries";
 import { useGetTrails } from "~/features/trails/queries";
 import { useGetViewpoints } from "~/features/viewpoints/queries";
 
 export async function loader({ request }: Route.LoaderArgs) {
+  const { client, headers } = makeSSRClient(request);
   const [viewpoints, trails, posts] = await Promise.all([
-    useGetViewpoints({ page: 1, pageSize: 10, sortBy: "popular" }),
-    useGetTrails({ page: 1, pageSize: 10, sortBy: "popular" }),
-    useGetPosts({ page: 1, pageSize: 10, sortBy: "newest" }),
+    useGetViewpoints(client, { page: 1, pageSize: 10, sortBy: "popular" }),
+    useGetTrails(client, { page: 1, pageSize: 10, sortBy: "popular" }),
+    useGetPosts(client, { page: 1, pageSize: 10, sortBy: "newest" }),
   ]);
 
   return {
