@@ -6,7 +6,7 @@ set search_path = ''
 as $$
 begin
     if new.raw_app_meta_data is not null then
-        if new.raw_app_meta_data ? 'provider' AND new.raw_app_meta_data ->> 'provider' = 'email' then
+        if new.raw_app_meta_data ? 'provider' AND new.raw_app_meta_data ->> 'provider' = 'email' OR new.raw_app_meta_data ->> 'provider' = 'phone' then
             if new.raw_user_meta_data ? 'name' and new.raw_user_meta_data ? 'username' then
                 insert into public.profiles (
                     profile_id,

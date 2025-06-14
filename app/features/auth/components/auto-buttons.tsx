@@ -28,6 +28,12 @@ export default function AuthButtons() {
           </Link>
         </Button>
         <Button variant="outline" className="w-full" asChild>
+          <Link to="/auth/sms/start">
+            <MessageCircleIcon className="w-4 h-4" />
+            SMS
+          </Link>
+        </Button>
+        <Button variant="outline" className="w-full" asChild>
           <Link to="/auth/otp/start">
             <LockIcon className="w-4 h-4" />
             OTP

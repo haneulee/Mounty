@@ -12,34 +12,30 @@ export const meta: Route.MetaFunction = () => {
 };
 
 const formSchema = z.object({
-  email: z.string().email(),
+  phone: z.string(),
 });
 
 export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData();
   const { data, success } = formSchema.safeParse(Object.fromEntries(formData));
   if (!success) {
-    return { error: "Invalid email address" };
+    return { error: "Invalid phone number" };
   }
-  const { email } = data;
+  const { phone } = data;
 
   const { client } = makeSSRClient(request);
 
   const { error } = await client.auth.signInWithOtp({
-    email,
+    phone,
     options: {
       shouldCreateUser: true,
-      data: {
-        email_confirm: true,
-      },
     },
   });
-
   if (error) {
-    return { error: "Failed to send OTP" };
+    return { error: "Failed to send SMS" };
   }
 
-  return redirect(`/auth/otp/complete?email=${email}`);
+  return redirect(`/auth/otp/complete?phone=${phone}`);
 };
 
 export default function OtpStartPage({ actionData }: Route.ComponentProps) {
@@ -52,18 +48,18 @@ export default function OtpStartPage({ actionData }: Route.ComponentProps) {
         <div className="text-center">
           <h1 className="text-2xl font-semibold">Log in with OTP</h1>
           <p className="text-sm text-muted-foreground">
-            We will send you a 4-digit code to log in to your account.
+            We will send you a 6-digit code to log in to your account.
           </p>
         </div>
         <Form className="w-full space-y-4" method="post">
           <InputPair
-            label="Email"
-            description="Enter your email address"
-            name="email"
-            id="email"
+            label="Phone"
+            description="Enter your phone number"
+            name="phone"
+            id="phone"
             required
-            type="email"
-            placeholder="i.e wemake@example.com"
+            type="tel"
+            placeholder="i.e 1234567890"
           />
           {actionData && "error" in actionData && (
             <p className="text-red-500 text-sm">{actionData.error}</p>

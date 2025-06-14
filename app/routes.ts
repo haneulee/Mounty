@@ -46,12 +46,14 @@ export default [
   ...prefix("auth", [
     layout("features/auth/layouts/auth-layout.tsx", [
       ...prefix("login", [index("features/auth/pages/login-page.tsx")]),
-      ...prefix("join", [
-        index("features/auth/pages/join-page.tsx"),
-        ...prefix("/otp", [
-          route("/start", "features/auth/pages/otp-start-page.tsx"),
-          route("/complete", "features/auth/pages/otp-complete-page.tsx"),
-        ]),
+      ...prefix("join", [index("features/auth/pages/join-page.tsx")]),
+      ...prefix("otp", [
+        route("/start", "features/auth/pages/otp-start-page.tsx"),
+        route("/complete", "features/auth/pages/otp-complete-page.tsx"),
+      ]),
+      ...prefix("sms", [
+        route("/start", "features/auth/pages/sms-start-page.tsx"),
+        route("/complete", "features/auth/pages/sms-complete-page.tsx"),
       ]),
       ...prefix("social", [
         route("/:provider/start", "features/auth/pages/social-start-page.tsx"),
