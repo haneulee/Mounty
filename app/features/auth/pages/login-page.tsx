@@ -59,7 +59,8 @@ export const meta: Route.MetaFunction = () => {
 
 export default function LoginPage({ actionData }: Route.ComponentProps) {
   const navigation = useNavigation();
-  const isSubmitting = navigation.state === "submitting";
+  const isSubmitting =
+    navigation.state === "submitting" || navigation.state === "loading";
   return (
     <div className="w-full h-full flex items-center justify-center">
       <div className="w-full max-w-md p-4 sm:p-6 lg:p-8">

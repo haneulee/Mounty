@@ -1,8 +1,12 @@
 import { Button } from "~/common/components/ui/button";
 import type { Route } from "~/types";
+import { makeSSRClient } from "~/supa-client";
+import { redirect } from "react-router";
 
-export function loader({ request }: Route.LoaderArgs) {
-  return {};
+export async function loader({ request }: Route.LoaderArgs) {
+  const { client, headers } = makeSSRClient(request);
+  await client.auth.signOut();
+  return redirect("/", { headers });
 }
 
 export function action({ request }: Route.ActionArgs) {
