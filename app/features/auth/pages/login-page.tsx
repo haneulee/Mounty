@@ -1,23 +1,53 @@
-import { Form, Link, useNavigation } from "react-router";
+import { Form, Link, redirect, useNavigation } from "react-router";
 
 import AuthButtons from "../components/auto-buttons";
 import { Button } from "~/common/components/ui/button";
 import InputPair from "~/common/components/input-pair";
 import { LoaderCircle } from "lucide-react";
 import type { Route } from "~/types";
+import { makeSSRClient } from "~/supa-client";
+import { z } from "zod";
 
 export function loader({ request }: Route.LoaderArgs) {
   return {};
 }
 
+const formSchema = z.object({
+  email: z
+    .string({
+      required_error: "Email is required",
+      invalid_type_error: "Email must be a string",
+    })
+    .email("Invalid email address"),
+  password: z
+    .string({
+      required_error: "Password is required",
+      invalid_type_error: "Password must be a string",
+    })
+    .min(8, "Password must be at least 8 characters long"),
+});
+
 export async function action({ request }: Route.ActionArgs) {
-  await new Promise((resolve) => setTimeout(resolve, 4000));
   const formData = await request.formData();
-  const email = formData.get("email");
-  const password = formData.get("password");
-  return {
-    message: "Error wrong password",
-  };
+  const { success, data, error } = formSchema.safeParse(
+    Object.fromEntries(formData)
+  );
+  if (!success) {
+    return {
+      formErrors: error.flatten().fieldErrors,
+    };
+  }
+  const { email, password } = data;
+  const { client, headers } = makeSSRClient(request);
+  const { data: authData, error: authError } =
+    await client.auth.signInWithPassword({
+      email,
+      password,
+    });
+  if (authError) {
+    return { loginError: authError.message };
+  }
+  return redirect("/", { headers });
 }
 
 export const meta: Route.MetaFunction = () => {
@@ -53,6 +83,11 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
               type="email"
               placeholder="test@example.com"
             />
+            {actionData && "formErrors" in actionData && (
+              <p className="text-sm text-red-500">
+                {actionData?.formErrors?.email?.join(", ")}
+              </p>
+            )}
             <InputPair
               id="password"
               label="Password"
@@ -61,15 +96,25 @@ export default function LoginPage({ actionData }: Route.ComponentProps) {
               type="password"
               placeholder="****"
             />
-            <Button className="w-full" type="submit" disabled={isSubmitting}>
+            {actionData && "formErrors" in actionData && (
+              <p className="text-sm text-red-500">
+                {actionData?.formErrors?.password?.join(", ")}
+              </p>
+            )}
+            <Button
+              className="w-full"
+              type="submit"
+              disabled={isSubmitting}
+              aria-disabled={isSubmitting}
+            >
               {isSubmitting ? (
                 <LoaderCircle className="animate-spin" />
               ) : (
                 "Log in"
               )}
             </Button>
-            {actionData?.message && (
-              <p className="text-sm text-red-500">{actionData.message}</p>
+            {actionData && "loginError" in actionData && (
+              <p className="text-sm text-red-500">{actionData?.loginError}</p>
             )}
           </Form>
           <div className="w-full">
