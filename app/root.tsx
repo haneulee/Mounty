@@ -15,6 +15,7 @@ import {
 import Navigation from "./common/components/navigation";
 import type { Route } from "./+types/root";
 import { cn } from "./lib/utils";
+import { getUserById } from "./features/users/queries";
 import { makeSSRClient } from "./supa-client";
 
 export const links: Route.LinksFunction = () => [
@@ -35,8 +36,19 @@ export async function loader({ request }: Route.LoaderArgs) {
   const {
     data: { user },
   } = await client.auth.getUser();
+  if (user) {
+    const profile = await getUserById(client, { id: user.id });
+    return {
+      user,
+      profile,
+      ENV: {
+        GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY,
+      },
+    };
+  }
   return {
-    user,
+    user: null,
+    profile: null,
     ENV: {
       GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY,
     },
@@ -81,7 +93,12 @@ export default function App({ loaderData }: Route.ComponentProps) {
       })}
     >
       {pathname.includes("/auth") ? null : (
-        <Navigation isLoggedIn={isLoggedIn} hasNotifications={true} />
+        <Navigation
+          isLoggedIn={isLoggedIn}
+          hasNotifications={true}
+          username={loaderData.profile?.username || ""}
+          name={loaderData.profile?.name || ""}
+        />
       )}
       <Outlet />
     </div>

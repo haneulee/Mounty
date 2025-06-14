@@ -3,7 +3,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "~/common/components/ui/avatar";
-import { Card, CardContent, CardHeader } from "~/common/components/ui/card";
+import { Link, redirect } from "react-router";
 import {
   Tabs,
   TabsContent,
@@ -12,13 +12,13 @@ import {
 } from "~/common/components/ui/tabs";
 
 import { Button } from "~/common/components/ui/button";
-import { Input } from "~/common/components/ui/input";
-import { Link } from "react-router";
+import { ChangePassword } from "../components/change-password";
+import { EditProfile } from "../components/edit-profile";
 import { LogOutIcon } from "lucide-react";
 import { MyContent } from "~/features/users/components/my-content";
+import { NotificationSettings } from "../components/notification-settings";
 import type { Route } from "~/types";
-import { Separator } from "~/common/components/ui/separator";
-import { Textarea } from "~/common/components/ui/textarea";
+import { getUserById } from "../queries";
 import { makeSSRClient } from "~/supa-client";
 
 interface User {
@@ -98,91 +98,19 @@ interface Comment {
   };
 }
 
-export function loader({ request }: Route.LoaderArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   const { client, headers } = makeSSRClient(request);
-  return {
-    user: {
-      id: "1",
-      username: "john_doe",
-      email: "john@example.com",
-      bio: "Mountain enthusiast and photographer",
-      profileImageUrl: "https://github.com/haneulee.png",
-      followersCount: 1234,
-      followingCount: 567,
-      postsCount: 89,
-      trailsCount: 12,
-      viewpointsCount: 34,
-    } as User,
-    viewpoints: [
-      {
-        id: "1",
-        title: "Mount Everest Base Camp",
-        description: "The most famous viewpoint in the world",
-        locationName: "Nepal",
-        latitude: 27.9881,
-        longitude: 86.925,
-        thumbnailPhotoUrl: "https://github.com/haneulee.png",
-        createdAt: new Date(),
-        createdBy: {
-          id: "1",
-          username: "john_doe",
-          profileImageUrl: "https://github.com/haneulee.png",
-        },
-      },
-    ] as Viewpoint[],
-    trails: [
-      {
-        id: "1",
-        title: "Everest Base Camp Trek",
-        description: "The classic trek to Everest Base Camp",
-        startLocation: "Lukla",
-        endLocation: "Everest Base Camp",
-        distance: 130,
-        elevationGain: 2800,
-        estimatedTime: 12,
-        difficulty: "hard",
-        season: "spring",
-        thumbnailPhotoUrl: "https://github.com/haneulee.png",
-        createdAt: new Date(),
-        createdBy: {
-          id: "1",
-          username: "john_doe",
-          profileImageUrl: "https://github.com/haneulee.png",
-        },
-      },
-    ] as Trail[],
-    posts: [
-      {
-        id: "1",
-        title: "My Journey to Everest Base Camp",
-        content:
-          "An unforgettable experience trekking to the base of the world's highest mountain...",
-        thumbnailPhotoUrl: "https://github.com/haneulee.png",
-        createdAt: new Date(),
-        createdBy: {
-          id: "1",
-          username: "john_doe",
-          profileImageUrl: "https://github.com/haneulee.png",
-        },
-      },
-    ] as Post[],
-    comments: [
-      {
-        id: "1",
-        content: "Great post! I've been there last year and it was amazing.",
-        createdAt: new Date(),
-        post: {
-          id: "1",
-          title: "Everest Base Camp Experience",
-        },
-        createdBy: {
-          id: "1",
-          username: "john_doe",
-          profileImageUrl: "https://github.com/haneulee.png",
-        },
-      },
-    ] as Comment[],
-  };
+  const {
+    data: { user },
+  } = await client.auth.getUser();
+  if (user) {
+    const profile = await getUserById(client, { id: user.id });
+    return {
+      user,
+      profile,
+    };
+  }
+  return redirect("/auth/login");
 }
 
 export function action({ request }: Route.ActionArgs) {
@@ -197,7 +125,7 @@ export const meta: Route.MetaFunction = () => {
 };
 
 export default function MyProfilePage({ loaderData }: Route.ComponentProps) {
-  const { user, viewpoints, trails, posts, comments } = loaderData;
+  const { user, profile, viewpoints, trails, posts, comments } = loaderData;
 
   return (
     <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
@@ -207,7 +135,7 @@ export default function MyProfilePage({ loaderData }: Route.ComponentProps) {
             <Avatar className="size-24 sm:size-32">
               <AvatarImage src={user.profileImageUrl} />
               <AvatarFallback className="text-2xl">
-                {user.username[0].toUpperCase()}
+                {profile.username?.slice(0, 1).toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>
           </div>
@@ -215,9 +143,8 @@ export default function MyProfilePage({ loaderData }: Route.ComponentProps) {
             <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-4">
               <div>
                 <h1 className="text-2xl sm:text-3xl font-bold mb-2">
-                  {user.username}
+                  {profile.name}
                 </h1>
-                <p className="text-muted-foreground mb-4">{user.bio}</p>
                 <div className="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-6">
                   <div>
                     <div className="font-medium">{user.followersCount}</div>
@@ -291,173 +218,15 @@ export default function MyProfilePage({ loaderData }: Route.ComponentProps) {
           </TabsList>
 
           <TabsContent value="edit-profile">
-            <Card>
-              <CardHeader>
-                <h2 className="text-xl font-semibold">Edit Profile</h2>
-              </CardHeader>
-              <CardContent>
-                <form className="space-y-4 sm:space-y-6">
-                  <div className="space-y-2">
-                    <label htmlFor="username" className="text-sm font-medium">
-                      Username
-                    </label>
-                    <Input
-                      id="username"
-                      name="username"
-                      defaultValue={user.username}
-                      required
-                      className="w-full"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm font-medium">
-                      Email
-                    </label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      defaultValue={user.email}
-                      required
-                      className="w-full"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="bio" className="text-sm font-medium">
-                      Bio
-                    </label>
-                    <Textarea
-                      id="bio"
-                      name="bio"
-                      defaultValue={user.bio}
-                      placeholder="Tell us about yourself"
-                      className="w-full min-h-[100px]"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="profileImage"
-                      className="text-sm font-medium"
-                    >
-                      Profile Image
-                    </label>
-                    <Input
-                      id="profileImage"
-                      name="profileImage"
-                      type="file"
-                      accept="image/*"
-                      className="w-full"
-                    />
-                  </div>
-
-                  <Button type="submit" className="w-full">
-                    Save Changes
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+            <EditProfile user={user} />
           </TabsContent>
 
           <TabsContent value="change-password">
-            <Card>
-              <CardHeader>
-                <h2 className="text-xl font-semibold">Change Password</h2>
-              </CardHeader>
-              <CardContent>
-                <form className="space-y-4 sm:space-y-6">
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="currentPassword"
-                      className="text-sm font-medium"
-                    >
-                      Current Password
-                    </label>
-                    <Input
-                      id="currentPassword"
-                      name="currentPassword"
-                      type="password"
-                      required
-                      className="w-full"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="newPassword"
-                      className="text-sm font-medium"
-                    >
-                      New Password
-                    </label>
-                    <Input
-                      id="newPassword"
-                      name="newPassword"
-                      type="password"
-                      required
-                      className="w-full"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="confirmPassword"
-                      className="text-sm font-medium"
-                    >
-                      Confirm New Password
-                    </label>
-                    <Input
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      type="password"
-                      required
-                      className="w-full"
-                    />
-                  </div>
-
-                  <Button type="submit" className="w-full">
-                    Change Password
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+            <ChangePassword />
           </TabsContent>
 
           <TabsContent value="notifications">
-            <Card>
-              <CardHeader>
-                <h2 className="text-xl font-semibold">Notification Settings</h2>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                      <h3 className="font-medium">Email Notifications</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Receive email notifications for new followers and
-                        comments
-                      </p>
-                    </div>
-                    <Button variant="outline" className="w-full sm:w-auto">
-                      Enable
-                    </Button>
-                  </div>
-                  <Separator />
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                      <h3 className="font-medium">Push Notifications</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Receive push notifications for new messages and mentions
-                      </p>
-                    </div>
-                    <Button variant="outline" className="w-full sm:w-auto">
-                      Enable
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <NotificationSettings />
           </TabsContent>
 
           <TabsContent value="my-content">
